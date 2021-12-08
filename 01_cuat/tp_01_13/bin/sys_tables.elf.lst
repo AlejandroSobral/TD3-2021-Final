@@ -1,0 +1,94 @@
+     1                                  SECTION .sys_tables_progbits
+     2                                  
+     3                                  %define BOOT_SEG 0xF0000
+     4                                  EXTERN  EXCEPTION_DUMMY
+     5                                  EXTERN __SYS_TABLES_LMA
+     6                                  GLOBAL  CS_SEL_16
+     7                                  GLOBAL  CS_SEL_32
+     8                                  GLOBAL CS_SEL_11
+     9                                  GLOBAL DS_SEL_11
+    10                                  GLOBAL  DS_SEL
+    11                                  GLOBAL TSS_SEL
+    12                                  GLOBAL gdtr_32
+    13                                  GLOBAL gdtr_16
+    14                                  
+    15                                  SECTION .sys_tables_progbits
+    16                                  
+    17                                  %define BOOT_SEG 0xF0000
+    18                                  
+    19                                  ;https://en.wikipedia.org/wiki/Global_Descriptor_Table#/media/File:SegmentDescriptor.svg
+    20                                  ;https://wiki.osdev.org/GDT_Tutorial
+    21                                  
+    22                                  GDT:
+    23                                  NULL_SEL    equ $-GDT
+    24 00000000 0000000000000000            dq 0x0
+    25                                  CS_SEL_32   equ $-GDT
+    26 00000008 FFFF                        dw 0xFFFF       ;Limit 15-0
+    27 0000000A 0000                        dw 0x0000       ;Base 15-0
+    28 0000000C 00                          db 0x00         ;Base 23-16
+    29 0000000D 99                          db 10011001b    ;Attributes:
+    30                                                      ;P
+    31                                                      ;DPL
+    32                                                      ;S
+    33                                                      ;D/C
+    34                                                      ;ED/C
+    35                                                      ;R/w
+    36                                                      ;A
+    37 0000000E CF                          db 11001111b    ;Limit
+    38                                                      ;G
+    39                                                      ;D/B
+    40                                                      ;L
+    41                                                      ;AVL
+    42 0000000F 00                          db 0x00         ;Base
+    43                                  DS_SEL   equ $-GDT
+    44 00000010 FFFF                        dw 0xFFFF       ;Limit 15-0
+    45 00000012 0000                        dw 0x0000       ;Base 15-0
+    46 00000014 00                          db 0x00         ;Base 23-16
+    47 00000015 92                          db 10010010b    ;Attributes:
+    48                                                      ;P
+    49                                                      ;DPL
+    50                                                      ;S
+    51                                                      ;D/C
+    52                                                      ;ED/C
+    53                                                      ;R/w
+    54                                                      ;A
+    55 00000016 CF                          db 11001111b    ;Limit
+    56                                                      ;G
+    57                                                      ;D/B
+    58                                                      ;L
+    59                                                      ;AVL
+    60 00000017 00                          db 0x00         ;Base
+    61                                  
+    62                                  CS_SEL_11 equ $-GDT          
+    63 00000018 FFFF                        dw  0xFFFF               
+    64 0000001A 0000                        dw  0                    
+    65 0000001C 00                          db  0                    
+    66 0000001D FA                          db  0xFA                 
+    67 0000001E CF                          db  0xCF                 
+    68 0000001F 00                          db  0x00                 
+    69                                  
+    70                                  DS_SEL_11 equ $-GDT          
+    71 00000020 FFFF                        dw  0xFFFF               
+    72 00000022 0000                        dw  0                    
+    73 00000024 00                          db  0                    
+    74 00000025 F2                          db  0xF2                 
+    75 00000026 CF                          db  0xCF                 
+    76 00000027 00                          db  0x00  
+    77                                  
+    78                                  TSS_SEL equ $-GDT          
+    79 00000028 6700                        dw  0x0067             
+    80 0000002A 0010                        dw  0x1000             
+    81 0000002C 00                          db  0                  
+    82 0000002D 89                          db  10001001b          
+    83 0000002E 40                          db  01000000b          
+    84 0000002F 00                          db  0                  
+    85                                  GDT_LENGTH EQU $-GDT
+    86                                  
+    87                                  
+    88                                  gdtr_32:
+    89 00000030 2F00                        dw GDT_LENGTH-1
+    90 00000032 [00000000]                  dd GDT
+    91                                  
+    92                                  
+    93                                       
+    94                                  

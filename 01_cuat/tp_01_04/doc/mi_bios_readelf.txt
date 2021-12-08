@@ -1,0 +1,128 @@
+Encabezado ELF:
+  Mágico:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Clase:                             ELF32
+  Datos:                             complemento a 2, little endian
+  Versión:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  Versión ABI:                       0
+  Tipo:                              EXEC (Fichero ejecutable)
+  Máquina:                           Intel 80386
+  Versión:                           0x1
+  Dirección del punto de entrada:               0xfffffff0
+  Inicio de encabezados de programa:          52 (bytes en el fichero)
+  Inicio de encabezados de sección:          18204 (bytes en el fichero)
+  Opciones:                          0x0
+  Tamaño de este encabezado:         52 (bytes)
+  Tamaño de encabezados de programa: 32 (bytes)
+  Número de encabezados de programa: 5
+  Tamaño de encabezados de sección:  40 (bytes)
+  Número de encabezados de sección:  12
+  Índice de tabla de cadenas de sección de encabezado: 11
+
+Encabezados de Sección:
+  [Nr] Nombre            Tipo            Direc    Desp   Tam    ES Opt En Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .codigo_kernel32  PROGBITS        00202000 003000 000003 00   A  0   0  1
+  [ 2] .functions        PROGBITS        00100000 002000 00003c 00  AX  0   0  1
+  [ 3] .init16           PROGBITS        ffff0000 001000 00003f 00   A  0   0  1
+  [ 4] .init32           PROGBITS        fffff800 003800 00007e 00   A  0   0  1
+  [ 5] .functions_rom    PROGBITS        fffffc00 003c00 00003c 00  AX  0   0  1
+  [ 6] .data             PROGBITS        fffffd00 003d00 000026 00  WA  0   0  1
+  [ 7] .reset            PROGBITS        fffffff0 003ff0 000010 00   A  0   0 16
+  [ 8] .comment          PROGBITS        00000000 004000 000029 01  MS  0   0  1
+  [ 9] .symtab           SYMTAB          00000000 00402c 0003b0 10     10  24  4
+  [10] .strtab           STRTAB          00000000 0043dc 0002d3 00      0   0  1
+  [11] .shstrtab         STRTAB          00000000 0046af 00006c 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  p (processor specific)
+
+No hay grupos de sección en este fichero.
+
+Encabezados de Programa:
+  Tipo           Desplaz  DirVirt    DirFísica  TamFich TamMem  Opt Alin
+  LOAD           0x001000 0xffff0000 0xffff0000 0x0003f 0x0003f R   0x1000
+  LOAD           0x002000 0x00100000 0xffff1000 0x0003c 0x0003c R E 0x1000
+  LOAD           0x003000 0x00202000 0xffff2000 0x00003 0x00003 R   0x1000
+  LOAD           0x003800 0xfffff800 0xfffff800 0x00800 0x00800 RWE 0x1000
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+
+ mapeo de Sección a Segmento:
+  Segmento Secciones...
+   00     .init16 
+   01     .functions 
+   02     .codigo_kernel32 
+   03     .init32 .functions_rom .data .reset 
+   04     
+
+No hay sección dinámica en este fichero.
+
+No hay reubicaciones en este fichero.
+
+The decoding of unwind sections for machine type Intel 80386 is not currently supported.
+
+Symbol table '.symtab' contains 59 entries:
+   Num:    Valor  Tam  Tipo    Unión  Vis      Nombre Ind
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00202000     0 SECTION LOCAL  DEFAULT    1 
+     2: 00100000     0 SECTION LOCAL  DEFAULT    2 
+     3: ffff0000     0 SECTION LOCAL  DEFAULT    3 
+     4: fffff800     0 SECTION LOCAL  DEFAULT    4 
+     5: fffffc00     0 SECTION LOCAL  DEFAULT    5 
+     6: fffffd00     0 SECTION LOCAL  DEFAULT    6 
+     7: fffffff0     0 SECTION LOCAL  DEFAULT    7 
+     8: 00000000     0 SECTION LOCAL  DEFAULT    8 
+     9: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/main.asm
+    10: 00202000     0 NOTYPE  LOCAL  DEFAULT    1 kernel32_init.guard
+    11: 00202003     0 NOTYPE  LOCAL  DEFAULT    1 kernel32_end
+    12: 00000000     0 FILE    LOCAL  DEFAULT  ABS functions.c
+    13: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/init16.asm
+    14: ffff003e     0 NOTYPE  LOCAL  DEFAULT    3 fault_end
+    15: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/init32.asm
+    16: fffff823     0 NOTYPE  LOCAL  DEFAULT    4 start32_launcher.stack_in
+    17: fffff87b     0 NOTYPE  LOCAL  DEFAULT    4 start32_launcher.halteo
+    18: 00000000     0 FILE    LOCAL  DEFAULT  ABS functions_rom.c
+    19: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/sys_tables.asm
+    20: fffffd00     0 NOTYPE  LOCAL  DEFAULT    6 GDT
+    21: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS NULL_SEL
+    22: 00000020     0 NOTYPE  LOCAL  DEFAULT  ABS GDT_LENGTH
+    23: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/reset.asm
+    24: fffffff0     0 NOTYPE  GLOBAL DEFAULT  ABS __RESET_LMA
+    25: ffff1000     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_LMA
+    26: 0000003c     0 NOTYPE  GLOBAL DEFAULT  ABS __functions_size
+    27: fffffc00     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_ROM_VMA
+    28: ffff0000     0 NOTYPE  GLOBAL DEFAULT  ABS __INIT_16_LMA
+    29: fffffc00     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_ROM_LMA
+    30: 00000018     0 NOTYPE  GLOBAL DEFAULT  ABS DS_SEL
+    31: fffffff0     0 NOTYPE  GLOBAL DEFAULT    7 reset
+    32: 2ff08000     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_START_32
+    33: 00100000     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_VMA
+    34: ffff0000     0 NOTYPE  GLOBAL DEFAULT  ABS __INIT_16_VMA
+    35: fffffd20     0 NOTYPE  GLOBAL DEFAULT    6 _gdtr
+    36: ffff0000     0 NOTYPE  GLOBAL DEFAULT    3 init16
+    37: fffffd00     0 NOTYPE  GLOBAL DEFAULT  ABS __SYS_TABLES_VMA
+    38: 00009000     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_START_16
+    39: 00202000     0 NOTYPE  GLOBAL DEFAULT    1 kernel32_init
+    40: fffff800     0 NOTYPE  GLOBAL DEFAULT    4 init32
+    41: 2ff08fff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_END_32
+    42: 00202000     0 NOTYPE  GLOBAL DEFAULT  ABS __KERNEL_32_VMA
+    43: 00100000    60 FUNC    GLOBAL DEFAULT    2 __fast_memcpy
+    44: 00000010     0 NOTYPE  GLOBAL DEFAULT  ABS CS_SEL_32
+    45: 000003ff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_SIZE_32
+    46: 00009fff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_END_16
+    47: ffff2000     0 NOTYPE  GLOBAL DEFAULT  ABS __KERNEL_32_LMA
+    48: 00000008     0 NOTYPE  GLOBAL DEFAULT  ABS CS_SEL_16
+    49: fffffff0     0 NOTYPE  GLOBAL DEFAULT  ABS __RESET_VMA
+    50: 00000003     0 NOTYPE  GLOBAL DEFAULT  ABS kernel32_code_size
+    51: fffff800     0 NOTYPE  GLOBAL DEFAULT  ABS __INIT_32_VMA
+    52: 00060000     0 NOTYPE  GLOBAL DEFAULT  ABS __EH_FRAME
+    53: 00050000     0 NOTYPE  GLOBAL DEFAULT  ABS __DATA_NO_INIT
+    54: fffff800     0 NOTYPE  GLOBAL DEFAULT  ABS __INIT_32_LMA
+    55: fffffd00     0 NOTYPE  GLOBAL DEFAULT  ABS __SYS_TABLES_LMA
+    56: 00000003     0 NOTYPE  GLOBAL DEFAULT  ABS __codigo_kernel32_size
+    57: fffffc00    60 FUNC    GLOBAL DEFAULT    5 __fast_memcpy_rom
+    58: fffff800     0 NOTYPE  GLOBAL DEFAULT    4 start32_launcher
+
+No se encontró información de versión en este fichero.

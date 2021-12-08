@@ -1,0 +1,58 @@
+     1                                  GLOBAL KEYBOARD_BUFFER_ITSELF
+     2                                  GLOBAL DIGIT_TABLE_KERNEL
+     3                                  GLOBAL TIMER_COUNTER
+     4                                  GLOBAL KEYBOARD_COUNTER
+     5                                  GLOBAL SCREEN_POINTER
+     6                                  GLOBAL PF_ERROR_CODE
+     7                                  GLOBAL PF_VMA_ADDR
+     8                                  GLOBAL SCH_ACTUAL_TASK
+     9                                  GLOBAL SCH_NEXT_TASK
+    10                                  GLOBAL STATUS_T1
+    11                                  GLOBAL STATUS_T2
+    12                                  GLOBAL STATUS_T3
+    13                                  GLOBAL STATUS_T4
+    14                                  GLOBAL TSS_TO_LOAD 
+    15                                  GLOBAL CR3_TO_LOAD
+    16                                  GLOBAL NEW_STACK
+    17                                  GLOBAL TASK1_COUNTER 
+    18                                  GLOBAL TASK2_COUNTER 
+    19                                  GLOBAL TASK3_COUNTER 
+    20                                  GLOBAL TASK4_COUNTER
+    21                                  GLOBAL FIRST_TIME_SCH_FLAG
+    22                                  GLOBAL AC_DW
+    23                                  
+    24                                  
+    25                                  ;Mem Section
+    26                                  SECTION .TABLE_KEYBOARD
+    27 00000000 <res 000000BE>          DIGIT_TABLE_KERNEL resb 190 ;
+    27          ******************       warning: uninitialized space declared in non-BSS section `.TABLE_KEYBOARD': zeroing
+    28 000000BE <res 00000013>          KEYBOARD_BUFFER_ITSELF resb 19   ;
+    28          ******************       warning: uninitialized space declared in non-BSS section `.TABLE_KEYBOARD': zeroing
+    29 000000D1 00                      KEYBOARD_COUNTER db 0x00; Count how many keys were pressed
+    30                                  
+    31                                   
+    32                                  SECTION .__DATA__
+    33 00000000 0000                    TIMER_COUNTER dw 0x00
+    34 00000002 0000                    TASK1_COUNTER dw 0x00
+    35 00000004 0000                    TASK2_COUNTER dw 0x00
+    36 00000006 0000                    TASK3_COUNTER dw 0x00
+    37 00000008 0000                    TASK4_COUNTER dw 0x00
+    38 0000000A 00                      SCH_ACTUAL_TASK db 0
+    39 0000000B 00                      SCH_NEXT_TASK db 0
+    40 0000000C <res 00000004>          SCREEN_POINTER resb 4; 
+    40          ******************       warning: uninitialized space declared in non-BSS section `.__DATA__': zeroing
+    41 00000010 <res 00000004>          PF_ERROR_CODE resd 1
+    41          ******************       warning: uninitialized space declared in non-BSS section `.__DATA__': zeroing
+    42 00000014 <res 00000004>          PF_VMA_ADDR resd 1
+    42          ******************       warning: uninitialized space declared in non-BSS section `.__DATA__': zeroing
+    43 00000018 00                      FIRST_TIME_SCH_FLAG db 0
+    44 00000019 00                      STATUS_T1 db 0
+    45 0000001A 00                      STATUS_T2 db 0
+    46 0000001B 00                      STATUS_T3 db 0
+    47 0000001C 00                      STATUS_T4 db 0
+    48 0000001D 00000000                TSS_TO_LOAD dd 0
+    49 00000021 00000000                CR3_TO_LOAD dd 0
+    50 00000025 <res 000000C0>          NEW_STACK resd 48
+    50          ******************       warning: uninitialized space declared in non-BSS section `.__DATA__': zeroing
+    51 000000E5 FFFF                    AC_DW dw 0xFFFFFFF
+    51          ******************       warning: word data exceeds bounds [-w+number-overflow]

@@ -1,0 +1,114 @@
+     1                                  %include "inc/defines.h" 
+     1                              <1> 
+     2                              <1> %define PORT_A_8042    0x60
+     3                              <1> %define CTRL_PORT_8042 0x64
+     4                              <1> %define KEYB_DIS       0xAD
+     5                              <1> %define KEYB_EN        0xAE
+     6                              <1> %define READ_OUT_8042  0xD0
+     7                              <1> %define WRITE_OUT_8042 0xD1
+     8                              <1> 
+     9                              <1> 
+    10                              <1> %define _KEY_1     0x02
+    11                              <1> %define _KEY_2     0x03
+    12                              <1> %define _KEY_3     0x04
+    13                              <1> %define _KEY_4     0x05
+    14                              <1> %define _KEY_5     0x06
+    15                              <1> %define _KEY_6     0x07
+    16                              <1> %define _KEY_7     0x08
+    17                              <1> %define _KEY_8     0x09
+    18                              <1> %define _KEY_9     0x0A
+    19                              <1> %define _KEY_0     0x0B
+    20                              <1> 
+    21                              <1> %define _KEY_ENTER 0x1C
+    22                              <1> 
+    23                              <1> %define _KEY_A     0x1E
+    24                              <1> %define _KEY_B     0x30
+    25                              <1> %define _KEY_C     0x2E
+    26                              <1> %define _KEY_D     0x20
+    27                              <1> %define _KEY_E     0x12
+    28                              <1> %define _KEY_F     0x21
+    29                              <1> %define _KEY_G     0x22
+    30                              <1> %define _KEY_H     0x23
+    31                              <1> %define _KEY_I     0x17
+    32                              <1> %define _KEY_J     0x24
+    33                              <1> %define _KEY_K     0x25
+    34                              <1> %define _KEY_L     0x26
+    35                              <1> %define _KEY_M     0x32
+    36                              <1> %define _KEY_N     0x31
+    37                              <1> %define _KEY_O     0x18
+    38                              <1> %define _KEY_P     0x19
+    39                              <1> %define _KEY_Q     0x10
+    40                              <1> %define _KEY_R     0x13
+    41                              <1> %define _KEY_S     0x1F
+    42                              <1> %define _KEY_T     0x14
+    43                              <1> %define _KEY_U     0x16
+    44                              <1> %define _KEY_V     0x2F
+    45                              <1> %define _KEY_W     0x11
+    46                              <1> %define _KEY_X     0x2D
+    47                              <1> %define _KEY_Y     0x15
+    48                              <1> %define _KEY_Z     0x2C
+    49                              <1> 
+    50                              <1> SYS_CALL_HALT     EQU     0
+    51                              <1> SYS_CALL_READ     EQU     1
+    52                              <1> SYS_CALL_WRITE    EQU     2
+    53                              <1> SYS_CALL_SCREEN   EQU     3
+    54                              <1> 
+    55                              <1>  
+     2                                  section .task03_functions
+     3                                  USE32
+     4                                  
+     5                                  GLOBAL TASK3_LABEL
+     6                                  
+     7                                  EXTERN SCREEN_WRITING
+     8                                  EXTERN SCREEN_POINTER
+     9                                  EXTERN DIGIT_TABLE_KERNEL
+    10                                  EXTERN __VIDEO_VMA
+    11                                  DATA_TABLE_SIZE EQU 10
+    12                                  VIDEO_BUFFER_ADDR EQU 0x00E80000
+    13                                  DIGIT_TOTAL_TABLE_SIZE EQU 160
+    14                                  
+    15                                  TASK3_LABEL:
+    16                                  
+    17                                      ;Ask Kernel to get data
+    18 00000000 BE[00000000]                mov esi, DIGIT_TABLE_KERNEL               
+    19 00000005 BF[08000000]                mov edi, DIGIT_TABLE_TASK3    
+    20 0000000A B9A0000000                  mov ecx, DIGIT_TOTAL_TABLE_SIZE                           
+    21 0000000F B801000000                  mov eax, SYS_CALL_READ                                      
+    22 00000014 CD80                        int 0x80
+    23                                       
+    24                                      ;; SIMD ADD ! .-.-.-.-.
+    25 00000016 31C9                        xor ecx, ecx
+    26 00000018 BE[08000000]                mov esi, DIGIT_TABLE_TASK3          ;Data Source        
+    27 0000001D BF[00000000]                mov edi, DIGIT_TABLE_TOTALSUM_TASK3      ;Total Sum                 
+    28 00000022 BB0A000000                  mov ebx, DATA_TABLE_SIZE
+    29 00000027 0FEFC0                      pxor mm0, mm0
+    30                                  
+    31                                  ADD_T3:
+    32 0000002A 0FD406                      paddq qword mm0, [esi]
+    32          ******************       warning: register size specification ignored
+    33 0000002D 83C608                      add esi, 8                          
+    34 00000030 41                          inc ecx
+    35 00000031 39D9                        cmp ecx, ebx
+    36 00000033 75F5                        jne ADD_T3
+    37 00000035 0F7F07                      movq qword [edi], mm0               
+    38                                      ;; END SIMD ADD .-.-.-.-.
+    39                                  
+    40                                  
+    41 00000038 BE[00000000]                mov esi, __VIDEO_VMA               
+    42 0000003D BF[00000000]                mov edi, DIGIT_TABLE_TOTALSUM_TASK3        
+    43 00000042 BA02000000                  mov edx, 2                          
+    44 00000047 B940000000                  mov ecx, 64                         
+    45 0000004C B803000000                  mov eax, SYS_CALL_SCREEN                                        
+    46 00000051 CD80                        int 0x80
+    47                                  
+    48                                  TASK_END_L:
+    49                                  
+    50 00000053 B800000000                  mov eax, SYS_CALL_HALT                 
+    51 00000058 CD80                        int 0x80
+    52 0000005A EBA4                        jmp TASK3_LABEL
+    53                                  
+    54                                  
+    55                                  section .data_03
+    56 00000000 0000000000000000        DIGIT_TABLE_TOTALSUM_TASK3 dq 0
+    57 00000008 <res 000000BE>          DIGIT_TABLE_TASK3 resb 190 ;  
+    57          ******************       warning: uninitialized space declared in non-BSS section `.data_03': zeroing

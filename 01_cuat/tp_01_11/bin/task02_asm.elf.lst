@@ -1,0 +1,39 @@
+     1                                  section .task02_functions
+     2                                  USE32
+     3                                  
+     4                                  GLOBAL TASK2_LABEL
+     5                                  
+     6                                  EXTERN sum_all_task2
+     7                                  EXTERN Screen_pointer
+     8                                  EXTERN Screen_Writing
+     9                                  EXTERN Load_Keyboard_table_Itself
+    10                                  EXTERN __VIDEO_VMA
+    11                                  VIDEO_BUFFER_ADDR EQU 0x00E80000
+    12                                  
+    13                                  TASK2_LABEL:
+    14                                      ;xchg bx, bx
+    15 00000000 B80000E800                  mov eax, VIDEO_BUFFER_ADDR
+    16 00000005 A3[00000000]                mov [Screen_pointer],eax;  Reload the screen pointer    
+    17                                  
+    18 0000000A 55                          push    ebp
+    19 0000000B 89E5                        mov     ebp, esp
+    20 0000000D 68[00000000]                push dword Keyboard_Buffer_TotalSum_Task2
+    21 00000012 68[00000000]                push dword Load_Keyboard_table_Itself
+    22 00000017 E8(00000000)                call sum_all_task2
+    23 0000001C C9                          leave
+    24                                      
+    25 0000001D 55                          push    ebp
+    26 0000001E 89E5                        mov     ebp, esp
+    27 00000020 6A40                        push 64 ;Column
+    28 00000022 6A01                        push 1  ;Row   
+    29 00000024 68[00000000]                push dword Keyboard_Buffer_TotalSum_Task2     
+    30 00000029 68[00000000]                push dword __VIDEO_VMA;:VIDEO_BUFFER_ADDR;[Screen_pointer]
+    31 0000002E E8(00000000)                call Screen_Writing
+    32 00000033 C9                          leave    
+    33 00000034 F4                          hlt
+    34 00000035 EBC9                        jmp TASK2_LABEL
+    35                                  
+    36                                  
+    37                                  
+    38                                  section .data_02
+    39 00000000 0000000000000000        Keyboard_Buffer_TotalSum_Task2 dq 0   

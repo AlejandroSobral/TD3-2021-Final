@@ -1,0 +1,35 @@
+     1                                  section .task03_functions
+     2                                  USE32
+     3                                  
+     4                                  GLOBAL TASK3_LABEL
+     5                                  
+     6                                  EXTERN sum_all_task3
+     7                                  EXTERN Screen_Writing
+     8                                  EXTERN Screen_pointer
+     9                                  EXTERN Load_Keyboard_table_Itself
+    10                                  EXTERN __VIDEO_VMA
+    11                                  VIDEO_BUFFER_ADDR EQU 0x00E80000
+    12                                  
+    13                                  TASK3_LABEL:
+    14 00000000 B80000E800                    mov eax, VIDEO_BUFFER_ADDR
+    15 00000005 A3[00000000]                mov [Screen_pointer],eax;  Reload the screen pointer    
+    16                                  
+    17 0000000A 55                          push    ebp
+    18 0000000B 89E5                        mov     ebp, esp
+    19 0000000D 68[00000000]                push dword Keyboard_Buffer_TotalSum_Task3
+    20 00000012 68[00000000]                push dword Load_Keyboard_table_Itself
+    21 00000017 E8(00000000)                call sum_all_task3
+    22 0000001C C9                          leave
+    23                                      
+    24 0000001D 55                          push    ebp
+    25 0000001E 89E5                        mov     ebp, esp
+    26 00000020 6A40                        push 64 ;Column
+    27 00000022 6A02                        push 2  ;Row   
+    28 00000024 68[00000000]                push dword Keyboard_Buffer_TotalSum_Task3     
+    29 00000029 68[00000000]                push dword __VIDEO_VMA;:VIDEO_BUFFER_ADDR;[Screen_pointer]
+    30 0000002E E8(00000000)                call Screen_Writing
+    31 00000033 C9                          leave    
+    32 00000034 F4                          hlt
+    33                                  
+    34                                  section .data_03
+    35 00000000 0000000000000000        Keyboard_Buffer_TotalSum_Task3 dq 0  

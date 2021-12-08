@@ -1,0 +1,335 @@
+     1                                  GLOBAL Basic_Scheduler ;
+     2                                  EXTERN TASK1_COUNTER 
+     3                                  EXTERN TASK2_COUNTER 
+     4                                  EXTERN TASK3_COUNTER 
+     5                                  EXTERN TASK4_COUNTER 
+     6                                  EXTERN TIMER_COUNTER
+     7                                  EXTERN SCH_NEXT_TASK
+     8                                  EXTERN SCH_ACTUAL_TASK
+     9                                  EXTERN TSS_TO_LOAD 
+    10                                  EXTERN CR3_TO_LOAD
+    11                                  EXTERN Timer_END_L
+    12                                  EXTERN FIRST_TIME_SCH_FLAG
+    13                                  EXTERN __TSS_KERNEL
+    14                                  EXTERN __TSS_TASK1
+    15                                  EXTERN __CR3_TASK1
+    16                                  EXTERN __TSS_TASK2
+    17                                  EXTERN __CR3_TASK2
+    18                                  EXTERN __TSS_TASK3
+    19                                  EXTERN __CR3_TASK3
+    20                                  EXTERN __TSS_TASK4
+    21                                  EXTERN __CR3_TASK4
+    22                                  EXTERN __MMX_TASK2
+    23                                  EXTERN __MMX_TASK3
+    24                                  EXTERN NEW_STACK
+    25                                  
+    26                                  TASK1 EQU 1
+    27                                  TASK2 EQU 2
+    28                                  TASK3 EQU 3
+    29                                  TASK4 EQU 4
+    30                                  CYCLE EQU 21
+    31                                  
+    32                                  __100mS EQU 10
+    33                                  __200mS EQU 20
+    34                                  __500mS EQU 50
+    35                                  
+    36                                  section .ISR_AND_KEYBOARD
+    37                                  
+    38                                  Basic_Scheduler:
+    39 00000000 60                          PUSHAD
+    40                                      
+    41 00000001 A1[00000000]                mov eax,[FIRST_TIME_SCH_FLAG]
+    42 00000006 83F800                      cmp eax,0                   
+    43 00000009 772C                        ja Not_first             
+    44                                  
+    45                                   first_entry:
+    46 0000000B 31C0                        xor eax, eax
+    47 0000000D 40                          inc eax
+    48 0000000E A3[00000000]                mov [FIRST_TIME_SCH_FLAG],eax   
+    49                                  
+    50 00000013 61                          POPAD
+    51                                      ;
+    52 00000014 C605[00000000]04            mov byte [SCH_ACTUAL_TASK], TASK4             ;Set a task as actual task (Idle task)
+    53                                  
+    54 0000001B B8[00000000]                mov eax, __TSS_TASK4
+    55 00000020 A3[00000000]                mov [TSS_TO_LOAD], eax
+    56 00000025 B8[00000000]                mov eax, __CR3_TASK4
+    57 0000002A A3[00000000]                mov [CR3_TO_LOAD], eax      
+    58 0000002F 0F22D8                      mov cr3,eax
+    59                                  
+    60 00000032 E982000000                  jmp LOAD_CONTEXT ; Only first time
+    61                                  
+    62                                  Not_first:
+    63                                      ;;
+    64 00000037 FE05[00000000]              inc byte [TASK1_COUNTER]
+    65 0000003D FE05[00000000]              inc byte [TASK2_COUNTER]
+    66 00000043 FE05[00000000]              inc byte [TASK3_COUNTER]        
+    67                                     
+    68                                  
+    69 00000049 803D[00000000]0A            cmp byte [TASK1_COUNTER], __100mS
+    70 00000050 7322                        jae _100mS_label
+    71                                  
+    72 00000052 803D[00000000]14            cmp byte [TASK2_COUNTER], __200mS
+    73 00000059 7329                        jae _200mS_label
+    74                                  
+    75 0000005B 803D[00000000]32            cmp byte [TASK3_COUNTER], __500mS
+    76 00000062 7330                        jae _500mS_label  
+    77                                  
+    78 00000064 C605[00000000]04            mov byte [SCH_ACTUAL_TASK], TASK4 ; If no flag got on, I shoudl execute the Idle Task
+    79 0000006B C605[00000000]04            mov byte [SCH_NEXT_TASK], TASK4   ; So TASK4 is ACTUAL and NEXT task to execute
+    80 00000072 EB30                        jmp ActualVsNext
+    81                                  
+    82                                  _100mS_label: ;Exec TASK1
+    83 00000074 C605[00000000]01            mov byte [SCH_NEXT_TASK], TASK1
+    84 0000007B C605[00000000]00            mov byte[TASK1_COUNTER], 0
+    85 00000082 EB20                        jmp ActualVsNext
+    86                                  
+    87                                  _200mS_label: ;Exec TASK2
+    88 00000084 C605[00000000]02            mov byte [SCH_NEXT_TASK], TASK2
+    89 0000008B C605[00000000]00            mov byte[TASK2_COUNTER], 0
+    90 00000092 EB10                        jmp ActualVsNext        
+    91                                  
+    92                                  _500mS_label: ;Exec TASK3
+    93 00000094 C605[00000000]03            mov byte [SCH_NEXT_TASK], TASK3
+    94 0000009B C605[00000000]00            mov byte[TASK3_COUNTER], 0 
+    95                                    
+    96 000000A2 EB00                        jmp ActualVsNext        
+    97                                  
+    98                                  
+    99                                  ActualVsNext:
+   100                                  
+   101 000000A4 31C0                        xor eax, eax
+   102 000000A6 31DB                        xor ebx, ebx
+   103 000000A8 A0[00000000]                mov al, byte[SCH_ACTUAL_TASK]
+   104 000000AD 8A1D[00000000]              mov bl, byte[SCH_NEXT_TASK]
+   105 000000B3 38D8                        cmp al, bl
+   106 000000B5 7465                        je SCH_END_NO_SWITCH ; If i'm running the same task I'd run after, there's nothing to be done
+   107 000000B7 7569                        jne SCH_SWITCH
+   108                                  
+   109                                   LOAD_CONTEXT:                 
+   110 000000B9 A1[00000000]                mov eax, [TSS_TO_LOAD]     
+   111 000000BE 8E4048                      mov es, [eax  + 0x48 ] 
+   112 000000C1 8E5854                      mov ds, [eax  + 0x54]
+   113 000000C4 8E6058                      mov fs, [eax  + 0x58]
+   114 000000C7 8E685C                      mov gs, [eax  + 0x5C]
+   115 000000CA 8B683C                      mov ebp, [eax + 0x3C]
+   116                                  
+   117                                      ;Stack
+   118 000000CD 8B5804                      mov ebx, [eax  + 0x04]
+   119 000000D0 891D[00000000]              mov [NEW_STACK], ebx
+   120 000000D6 8B5808                      mov ebx, [eax  + 0x08] ;SS0
+   121 000000D9 891D[04000000]              mov [NEW_STACK +4], ebx
+   122                                      ;LSS --> load stack segment
+   123 000000DF 0FB225[00000000]            lss esp, [NEW_STACK] 
+   124                                  
+   125 000000E6 8B5818                      mov ebx,  [eax + 0x18 ] ; SS2
+   126 000000E9 53                          push ebx
+   127 000000EA 8B5814                      mov ebx,  [eax + 0x14 ] ; ESP2
+   128 000000ED 53                          push ebx
+   129 000000EE 8B5824                      mov ebx,  [eax + 0x24 ] ; EFLGAS
+   130 000000F1 53                          push ebx  
+   131 000000F2 8B584C                      mov ebx,  [eax + 0x4C ] ; CS
+   132 000000F5 53                          push ebx 
+   133 000000F6 8B5820                      mov ebx,  [eax + 0x20 ] ; EIP
+   134 000000F9 53                          push ebx   
+   135                                   
+   136                                      ;GPRs
+   137 000000FA 8B482C                      mov ecx, [eax + 0x2C]
+   138 000000FD 8B5030                      mov edx, [eax + 0x30]
+   139 00000100 8B5834                      mov ebx, [eax + 0x34]       
+   140 00000103 8B7040                      mov esi, [eax + 0x40]
+   141 00000106 8B7844                      mov edi, [eax + 0x44]
+   142 00000109 8B4028                      mov eax, [eax + 0x28]    
+   143                                  
+   144                                      ;LOAD TSS INSTANCE
+   145                                  
+   146 0000010C FF35[00000000]              push dword[TSS_TO_LOAD]
+   147 00000112 E871010000                  call LOAD_DYN_TSS
+   148 00000117 83C404                      add esp,4
+   149 0000011A EB01                        jmp SCH_END_L
+   150                                  
+   151                                  
+   152                                  SCH_END_NO_SWITCH:
+   153 0000011C 61                          POPAD ; If no switch've been done, it's mandatory to POPAD reg.purp.
+   154                                  SCH_END_L:
+   155                                      
+   156                                      ;POPAD
+   157 0000011D E9(00000000)                jmp Timer_END_L        
+   158                                  
+   159                                  
+   160                                  
+   161                                  SCH_SWITCH: ;Not first time
+   162                                  ;Save actual context. Get the Next Task Context
+   163 00000122 803D[00000000]01            cmp byte [SCH_ACTUAL_TASK], TASK1 
+   164 00000129 741B                        je SAVE_TASK1_CONTEXT
+   165                                  
+   166 0000012B 803D[00000000]02            cmp byte [SCH_ACTUAL_TASK], TASK2 
+   167 00000132 741E                        je SAVE_TASK2_CONTEXT
+   168                                  
+   169 00000134 803D[00000000]03            cmp byte [SCH_ACTUAL_TASK], TASK3 
+   170 0000013B 7428                        je SAVE_TASK3_CONTEXT
+   171                                  
+   172 0000013D 803D[00000000]04            cmp byte [SCH_ACTUAL_TASK], TASK4 
+   173 00000144 7432                        je SAVE_TASK4_CONTEXT    
+   174                                  
+   175                                  
+   176                                  SAVE_TASK1_CONTEXT:
+   177                                      ;;
+   178 00000146 B8[00000000]                mov eax, __TSS_TASK1
+   179 0000014B A3[00000000]                mov [TSS_TO_LOAD], eax
+   180 00000150 EB32                        jmp SAVE_CONTEXT
+   181                                  SAVE_TASK2_CONTEXT:
+   182                                      ;;
+   183 00000152 B8[00000000]                mov eax, __TSS_TASK2
+   184 00000157 A3[00000000]                mov [TSS_TO_LOAD], eax
+   185 0000015C 0FAE05[00000000]            FXSAVE &__MMX_TASK2
+   186 00000163 EB1F                        jmp SAVE_CONTEXT
+   187                                  SAVE_TASK3_CONTEXT:
+   188                                      ;;
+   189 00000165 B8[00000000]                mov eax, __TSS_TASK3
+   190 0000016A A3[00000000]                mov [TSS_TO_LOAD], eax
+   191 0000016F 0FAE05[00000000]            FXSAVE &__MMX_TASK3        
+   192 00000176 EB0C                        jmp SAVE_CONTEXT
+   193                                  SAVE_TASK4_CONTEXT:
+   194                                      ;;
+   195 00000178 B8[00000000]                mov eax, __TSS_TASK4
+   196 0000017D A3[00000000]                mov [TSS_TO_LOAD], eax    
+   197 00000182 EB00                        jmp SAVE_CONTEXT    
+   198                                  
+   199                                   SAVE_CONTEXT:
+   200                                  
+   201                                   ;https://i.stack.imgur.com/KioUB.png
+   202 00000184 61                          POPAD
+   203                                      
+   204 00000185 891D[00000000]              mov [TSS_TO_LOAD + 0], ebx      
+   205 0000018B 890D[04000000]              mov [TSS_TO_LOAD + 4], ecx      
+   206 00000191 8915[08000000]              mov [TSS_TO_LOAD + 8], edx      
+   207 00000197 A3[0C000000]                mov [TSS_TO_LOAD + 12], eax     
+   208 0000019C 8935[10000000]              mov [TSS_TO_LOAD + 16], esi     
+   209 000001A2 893D[14000000]              mov [TSS_TO_LOAD + 20], edi     
+   210 000001A8 892D[18000000]              mov [TSS_TO_LOAD + 24], ebp     
+   211 000001AE 89E3                        mov ebx, esp
+   212 000001B0 891D[1C000000]              mov [TSS_TO_LOAD + 28], ebx     
+   213 000001B6 0F20DB                      mov ebx, cr3    
+   214 000001B9 891D[34000000]              mov [TSS_TO_LOAD + 52], ebx     
+   215 000001BF 8B5C2404                    mov ebx,[esp+4]
+   216 000001C3 891D[38000000]              mov [TSS_TO_LOAD + 56], ebx     
+   217 000001C9 8B1C24                      mov ebx,[esp]
+   218 000001CC 891D[44000000]              mov [TSS_TO_LOAD + 68], ebx     
+   219 000001D2 8B5C2408                    mov ebx,[esp+8]
+   220 000001D6 891D[48000000]              mov [TSS_TO_LOAD + 72], ebx     
+   221                                  
+   222                                  WHAT_TASK_NEXT: ;I'll never jump here
+   223                                  
+   224 000001DC 803D[00000000]01            cmp byte [SCH_NEXT_TASK], TASK1 
+   225 000001E3 741D                        je LOAD_TASK1_CONTEXT
+   226                                  
+   227 000001E5 803D[00000000]02            cmp byte [SCH_NEXT_TASK], TASK2 
+   228 000001EC 7430                        je LOAD_TASK2_CONTEXT
+   229                                  
+   230 000001EE 803D[00000000]03            cmp byte [SCH_NEXT_TASK], TASK3 
+   231 000001F5 744E                        je LOAD_TASK3_CONTEXT
+   232                                  
+   233 000001F7 803D[00000000]04            cmp byte [SCH_NEXT_TASK], TASK4 
+   234 000001FE 746C                        je LOAD_TASK4_CONTEXT
+   235 00000200 EB6A                        jmp LOAD_TASK4_CONTEXT ;Default value    
+   236                                  
+   237                                                    
+   238                                  LOAD_TASK1_CONTEXT:
+   239 00000202 B8[00000000]                mov eax, __TSS_TASK1
+   240 00000207 A3[00000000]                mov [TSS_TO_LOAD], eax
+   241 0000020C B8[00000000]                mov eax, __CR3_TASK1
+   242 00000211 A3[00000000]                mov [CR3_TO_LOAD], eax      
+   243 00000216 0F22D8                      mov cr3,eax
+   244 00000219 E99BFEFFFF                  jmp LOAD_CONTEXT
+   245                                  
+   246                                  LOAD_TASK2_CONTEXT:
+   247 0000021E B8[00000000]                mov eax, __TSS_TASK2
+   248 00000223 A3[00000000]                mov [TSS_TO_LOAD], eax
+   249 00000228 B8[00000000]                mov eax, __CR3_TASK2
+   250 0000022D A3[00000000]                mov [CR3_TO_LOAD], eax      
+   251 00000232 0F22D8                      mov cr3,eax
+   252                                      ;SET CR0.TS = 1
+   253 00000235 660F01E0                    smsw ax
+   254 00000239 6683C808                    or ax, 0x0008
+   255 0000023D 0F01F0                      lmsw ax
+   256 00000240 E974FEFFFF                  jmp LOAD_CONTEXT
+   257                                  
+   258                                  LOAD_TASK3_CONTEXT:                        
+   259 00000245 B8[00000000]                mov eax, __TSS_TASK3
+   260 0000024A A3[00000000]                mov [TSS_TO_LOAD], eax
+   261 0000024F B8[00000000]                mov eax, __CR3_TASK3
+   262 00000254 A3[00000000]                mov [CR3_TO_LOAD], eax      
+   263 00000259 0F22D8                      mov cr3,eax
+   264                                      ;SET CR0.TS = 1
+   265 0000025C 660F01E0                    smsw ax
+   266 00000260 6683C808                    or ax, 0x0008
+   267 00000264 0F01F0                      lmsw ax    
+   268 00000267 E94DFEFFFF                  jmp LOAD_CONTEXT
+   269                                  
+   270                                  LOAD_TASK4_CONTEXT:
+   271 0000026C B8[00000000]                mov eax, __TSS_TASK4
+   272 00000271 A3[00000000]                mov [TSS_TO_LOAD], eax
+   273 00000276 B8[00000000]                mov eax, __CR3_TASK4
+   274 0000027B A3[00000000]                mov [CR3_TO_LOAD], eax      
+   275 00000280 0F22D8                      mov cr3,eax
+   276 00000283 E931FEFFFF                  jmp LOAD_CONTEXT  
+   277                                  
+   278                                  
+   279                                  
+   280                                  LOAD_DYN_TSS:
+   281 00000288 8B5C2404                    mov ebx, [esp + 4] ; Back from push
+   282 0000028C 8B03                        mov eax, [ebx]
+   283 0000028E A3[00000000]                mov [__TSS_KERNEL], eax    ;Previous task link
+   284 00000293 8B4304                      mov eax, [ebx+0x04]
+   285 00000296 A3[04000000]                mov [__TSS_KERNEL+0x04], eax   ;ESP0
+   286 0000029B 8B4308                      mov eax, [ebx+0x08]
+   287 0000029E A3[08000000]                mov [__TSS_KERNEL+0x08], eax ;SS0 
+   288 000002A3 8B430C                      mov eax, [ebx+0x0C]
+   289 000002A6 A3[0C000000]                mov [__TSS_KERNEL+0x0C], eax ;ESP1
+   290 000002AB 8B4310                      mov eax, [ebx+0x10]
+   291 000002AE A3[10000000]                mov [__TSS_KERNEL+0x10], eax  ;SS1 
+   292 000002B3 8B4314                      mov eax, [ebx+0x14]
+   293 000002B6 A3[14000000]                mov [__TSS_KERNEL+0x14], eax  ;ESP
+   294 000002BB 8B4318                      mov eax, [ebx+0x18]
+   295 000002BE A3[18000000]                mov [__TSS_KERNEL+0x18], eax     ;SS2
+   296 000002C3 8B431C                      mov eax, [ebx+0x1C]
+   297 000002C6 A3[1C000000]                mov [__TSS_KERNEL+0x1C], eax    ;CR3
+   298 000002CB 8B4320                      mov eax, [ebx+0x20]
+   299 000002CE A3[20000000]                mov [__TSS_KERNEL+0x20], eax     ;EIP
+   300 000002D3 8B4324                      mov eax, [ebx+0x24]
+   301 000002D6 A3[24000000]                mov [__TSS_KERNEL+0x24], eax     ;EFLAGS
+   302 000002DB 8B4328                      mov eax, [ebx+0x28]
+   303 000002DE A3[28000000]                mov [__TSS_KERNEL+0x28], eax     ;EAX
+   304 000002E3 8B432C                      mov eax, [ebx+0x2C]
+   305 000002E6 A3[2C000000]                mov [__TSS_KERNEL+0x2C], eax     ;ECX
+   306 000002EB 8B4330                      mov eax, [ebx+0x30]
+   307 000002EE A3[30000000]                mov [__TSS_KERNEL+0x30], eax     ;EDX
+   308 000002F3 8B4334                      mov eax, [ebx+0x34]
+   309 000002F6 A3[34000000]                mov [__TSS_KERNEL+0x34], eax     ;EBX
+   310 000002FB 8B4338                      mov eax, [ebx+0x38]
+   311 000002FE A3[38000000]                mov [__TSS_KERNEL+0x38], eax    ;ESP
+   312 00000303 8B433C                      mov eax, [ebx+0x3C]
+   313 00000306 A3[3C000000]                mov [__TSS_KERNEL+0x3C], eax     ;EBP
+   314 0000030B 8B4340                      mov eax, [ebx+0x40]
+   315 0000030E A3[40000000]                mov [__TSS_KERNEL+0x40], eax     ;ESI
+   316 00000313 8B4344                      mov eax, [ebx+0x44]
+   317 00000316 A3[44000000]                mov [__TSS_KERNEL+0x44], eax     ;EDI
+   318 0000031B 8B4348                      mov eax, [ebx+0x48]
+   319 0000031E A3[48000000]                mov [__TSS_KERNEL+0x48], eax     ;ES
+   320 00000323 8B434C                      mov eax, [ebx+0x4C]
+   321 00000326 A3[4C000000]                mov [__TSS_KERNEL+0x4C], eax     ;CS
+   322 0000032B 8B4350                      mov eax, [ebx+0x50]
+   323 0000032E A3[50000000]                mov [__TSS_KERNEL+0x50], eax     ;SS
+   324 00000333 8B4354                      mov eax, [ebx+0x54]
+   325 00000336 A3[54000000]                mov [__TSS_KERNEL+0x54], eax     ;DS
+   326 0000033B 8B4358                      mov eax, [ebx+0x58]
+   327 0000033E A3[58000000]                mov [__TSS_KERNEL+0x58], eax     ;FS
+   328 00000343 8B435C                      mov eax, [ebx+0x5C]
+   329 00000346 A3[5C000000]                mov [__TSS_KERNEL+0x5C], eax     ;GS
+   330 0000034B 8B4360                      mov eax, [ebx+0x60]
+   331 0000034E A3[60000000]                mov [__TSS_KERNEL+0x60], eax     ;LDTR
+   332 00000353 8B4364                      mov eax, [ebx+0x64]
+   333 00000356 A3[64000000]                mov [__TSS_KERNEL+0x64], eax     ;Bitmap I/O
+   334                                  
+   335 0000035B C3                          ret

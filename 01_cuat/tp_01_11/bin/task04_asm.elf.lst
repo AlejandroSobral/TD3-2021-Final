@@ -1,0 +1,11 @@
+     1                                  section .task04_functions
+     2                                  USE32
+     3                                  
+     4                                  GLOBAL TASK4_LABEL
+     5                                  
+     6                                  TASK4_LABEL:
+     7                                      ;xchg bx, bx
+     8 00000000 B844440000                  mov eax, 0x4444
+     9 00000005 31C0                        xor eax, eax
+    10 00000007 F4                          hlt
+    11 00000008 EBF6                        jmp TASK4_LABEL

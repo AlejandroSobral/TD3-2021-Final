@@ -1,0 +1,337 @@
+Encabezado ELF:
+  Mágico:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Clase:                             ELF32
+  Datos:                             complemento a 2, little endian
+  Versión:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  Versión ABI:                       0
+  Tipo:                              EXEC (Fichero ejecutable)
+  Máquina:                           Intel 80386
+  Versión:                           0x1
+  Dirección del punto de entrada:               0xfffffff0
+  Inicio de encabezados de programa:          52 (bytes en el fichero)
+  Inicio de encabezados de sección:          56592 (bytes en el fichero)
+  Opciones:                          0x0
+  Tamaño de este encabezado:         52 (bytes)
+  Tamaño de encabezados de programa: 32 (bytes)
+  Número de encabezados de programa: 13
+  Tamaño de encabezados de sección:  40 (bytes)
+  Número de encabezados de sección:  19
+  Índice de tabla de cadenas de sección de encabezado: 18
+
+Encabezados de Sección:
+  [Nr] Nombre            Tipo            Direc    Desp   Tam    ES Opt En Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .sys_tables       PROGBITS        00000000 001000 000026 00   A  0   0  1
+  [ 2] .__DATA__o        PROGBITS        00200000 002000 00001b 00   A  0   0  1
+  [ 3] .ISR_AND_KEYBOARD PROGBITS        00100000 003000 000321 00   A  0   0  1
+  [ 4] .__TABLE_KEYBOARD PROGBITS        00210000 004000 0000d2 00   A  0   0  1
+  [ 5] .codigo_kernel32  PROGBITS        00220000 005000 000068 00   A  0   0  1
+  [ 6] .functions_o      PROGBITS        00050000 006000 0006ef 00 WAX  0   0  1
+  [ 7] .TASK_1_TEXT_o    PROGBITS        00310000 007000 000505 00  AX  0   0  1
+  [ 8] .TASK_1_BSS_o     NOBITS          00320000 008000 000019 00  WA  0   0  8
+  [ 9] .task_1_data      PROGBITS        00330000 008000 000001 00  WA  0   0  1
+  [10] .task_1_rodata    PROGBITS        00340000 009000 000001 00   A  0   0  1
+  [11] .init16           PROGBITS        ffff9000 00a000 001364 00   A  0   0  1
+  [12] .init32           PROGBITS        ffffa364 00b364 00060c 00   A  0   0  1
+  [13] .functions_rom    PROGBITS        ffffa970 00b970 00030a 00  AX  0   0  1
+  [14] .comment          PROGBITS        00000000 00c000 000029 01  MS  0   0  1
+  [15] .reset            PROGBITS        fffffff0 00bff0 000010 00   A  0   0 16
+  [16] .symtab           SYMTAB          00000000 00c02c 000f50 10     17 117  4
+  [17] .strtab           STRTAB          00000000 00cf7c 000caa 00      0   0  1
+  [18] .shstrtab         STRTAB          00000000 00dc26 0000e7 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  p (processor specific)
+
+No hay grupos de sección en este fichero.
+
+Encabezados de Programa:
+  Tipo           Desplaz  DirVirt    DirFísica  TamFich TamMem  Opt Alin
+  LOAD           0x001000 0x00000000 0xffff0000 0x00026 0x00026 R   0x1000
+  LOAD           0x002000 0x00200000 0xffff0026 0x0001b 0x0001b R   0x1000
+  LOAD           0x003000 0x00100000 0xffff0041 0x00321 0x00321 R   0x1000
+  LOAD           0x004000 0x00210000 0xffff0362 0x000d2 0x000d2 R   0x1000
+  LOAD           0x005000 0x00220000 0xffff0434 0x00068 0x00068 R   0x1000
+  LOAD           0x006000 0x00050000 0xffff049c 0x006ef 0x006ef RWE 0x1000
+  LOAD           0x007000 0x00310000 0xffff0b8b 0x00505 0x00505 R E 0x1000
+  LOAD           0x008000 0x00320000 0xffff1090 0x00000 0x00019 RW  0x1000
+  LOAD           0x008000 0x00330000 0xffff10a9 0x00001 0x00001 RW  0x1000
+  LOAD           0x009000 0x00340000 0xffff10aa 0x00001 0x00001 R   0x1000
+  LOAD           0x00a000 0xffff9000 0xffff9000 0x01c7a 0x01c7a R E 0x1000
+  LOAD           0x00bff0 0xfffffff0 0xfffffff0 0x00010 0x00010 R   0x1000
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+
+ mapeo de Sección a Segmento:
+  Segmento Secciones...
+   00     .sys_tables 
+   01     .__DATA__o 
+   02     .ISR_AND_KEYBOARD_CODE 
+   03     .__TABLE_KEYBOARD_VMA_o 
+   04     .codigo_kernel32 
+   05     .functions_o 
+   06     .TASK_1_TEXT_o 
+   07     .TASK_1_BSS_o 
+   08     .task_1_data 
+   09     .task_1_rodata 
+   10     .init16 .init32 .functions_rom 
+   11     .reset 
+   12     
+
+No hay sección dinámica en este fichero.
+
+No hay reubicaciones en este fichero.
+
+The decoding of unwind sections for machine type Intel 80386 is not currently supported.
+
+Symbol table '.symtab' contains 245 entries:
+   Num:    Valor  Tam  Tipo    Unión  Vis      Nombre Ind
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00000000     0 SECTION LOCAL  DEFAULT    1 
+     2: 00200000     0 SECTION LOCAL  DEFAULT    2 
+     3: 00100000     0 SECTION LOCAL  DEFAULT    3 
+     4: 00210000     0 SECTION LOCAL  DEFAULT    4 
+     5: 00220000     0 SECTION LOCAL  DEFAULT    5 
+     6: 00050000     0 SECTION LOCAL  DEFAULT    6 
+     7: 00310000     0 SECTION LOCAL  DEFAULT    7 
+     8: 00320000     0 SECTION LOCAL  DEFAULT    8 
+     9: 00330000     0 SECTION LOCAL  DEFAULT    9 
+    10: 00340000     0 SECTION LOCAL  DEFAULT   10 
+    11: ffff9000     0 SECTION LOCAL  DEFAULT   11 
+    12: ffffa364     0 SECTION LOCAL  DEFAULT   12 
+    13: ffffa970     0 SECTION LOCAL  DEFAULT   13 
+    14: 00000000     0 SECTION LOCAL  DEFAULT   14 
+    15: fffffff0     0 SECTION LOCAL  DEFAULT   15 
+    16: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/sys_tables.asm
+    17: 00000000     0 NOTYPE  LOCAL  DEFAULT    1 GDT
+    18: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS NULL_SEL
+    19: 00000020     0 NOTYPE  LOCAL  DEFAULT  ABS GDT_LENGTH
+    20: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/sys_data.asm
+    21: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/handlers.asm
+    22: 00000010     0 NOTYPE  LOCAL  DEFAULT  ABS Key_times_to_load
+    23: 001000f4     0 NOTYPE  LOCAL  DEFAULT    3 PF_P
+    24: 00100108     0 NOTYPE  LOCAL  DEFAULT    3 PF_RW
+    25: 0010011c     0 NOTYPE  LOCAL  DEFAULT    3 PF_US
+    26: 00100130     0 NOTYPE  LOCAL  DEFAULT    3 PF_ID
+    27: 00100144     0 NOTYPE  LOCAL  DEFAULT    3 END_PF
+    28: 00100207     0 NOTYPE  LOCAL  DEFAULT    3 K_0
+    29: 0010021b     0 NOTYPE  LOCAL  DEFAULT    3 K_1
+    30: 0010022f     0 NOTYPE  LOCAL  DEFAULT    3 K_2
+    31: 00100243     0 NOTYPE  LOCAL  DEFAULT    3 K_3
+    32: 00100257     0 NOTYPE  LOCAL  DEFAULT    3 K_4
+    33: 0010026b     0 NOTYPE  LOCAL  DEFAULT    3 K_5
+    34: 0010027c     0 NOTYPE  LOCAL  DEFAULT    3 K_6
+    35: 0010028d     0 NOTYPE  LOCAL  DEFAULT    3 K_7
+    36: 0010029e     0 NOTYPE  LOCAL  DEFAULT    3 K_8
+    37: 001002af     0 NOTYPE  LOCAL  DEFAULT    3 K_9
+    38: 001002c0     0 NOTYPE  LOCAL  DEFAULT    3 Buffer_full
+    39: 001002d1     0 NOTYPE  LOCAL  DEFAULT    3 K_ENTER
+    40: 001002db     0 NOTYPE  LOCAL  DEFAULT    3 K_ENTER_2
+    41: 001002ef     0 NOTYPE  LOCAL  DEFAULT    3 End_Keyboard
+    42: 00100308     0 NOTYPE  LOCAL  DEFAULT    3 Timer_fin
+    43: 0010030e     0 NOTYPE  LOCAL  DEFAULT    3 Clear_Counter
+    44: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/main.asm
+    45: 000b8000     0 NOTYPE  LOCAL  DEFAULT  ABS VIDEO_BUFFER_ADDR
+    46: 0022001a     0 NOTYPE  LOCAL  DEFAULT    5 wait_for_flag
+    47: 00220027     0 NOTYPE  LOCAL  DEFAULT    5 Average_on
+    48: 00220068     0 NOTYPE  LOCAL  DEFAULT    5 kernel32_end
+    49: 00000000     0 FILE    LOCAL  DEFAULT  ABS functions.c
+    50: 00000000     0 FILE    LOCAL  DEFAULT  ABS task01.c
+    51: 00320000     1 OBJECT  LOCAL  DEFAULT    8 table_index.1509
+    52: 00320008     8 OBJECT  LOCAL  DEFAULT    8 result_64.1548
+    53: 00320010     8 OBJECT  LOCAL  DEFAULT    8 aux.1549
+    54: 00320018     1 OBJECT  LOCAL  DEFAULT    8 i.1547
+    55: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/init16.asm
+    56: ffff902d     0 NOTYPE  LOCAL  DEFAULT   11 seq_regs_data
+    57: ffff9032     0 NOTYPE  LOCAL  DEFAULT   11 crtc_regs_data
+    58: ffff904b     0 NOTYPE  LOCAL  DEFAULT   11 graphics_regs_data
+    59: ffff9054     0 NOTYPE  LOCAL  DEFAULT   11 attrcon_regs_data
+    60: ffff9069     0 NOTYPE  LOCAL  DEFAULT   11 palette_data
+    61: ffff9129     0 NOTYPE  LOCAL  DEFAULT   11 font16x8
+    62: ffffa129     0 NOTYPE  LOCAL  DEFAULT   11 bios_init
+    63: ffffa129     0 NOTYPE  LOCAL  DEFAULT   11 recorrer_bus_pci
+    64: ffffa13b     0 NOTYPE  LOCAL  DEFAULT   11 ciclo_recorrer_bus_pci
+    65: ffffa167     0 NOTYPE  LOCAL  DEFAULT   11 dispositivo_hallado
+    66: ffffa185     0 NOTYPE  LOCAL  DEFAULT   11 procesar_funcion
+    67: ffffa19d     0 NOTYPE  LOCAL  DEFAULT   11 ir_a_siguiente_funcion
+    68: ffffa1c0     0 NOTYPE  LOCAL  DEFAULT   11 funcion_hallada
+    69: ffffa1f0     0 NOTYPE  LOCAL  DEFAULT   11 ciclo_llenar_BAR
+    70: ffffa23d     0 NOTYPE  LOCAL  DEFAULT   11 mapeado_en_memoria
+    71: ffffa25f     0 NOTYPE  LOCAL  DEFAULT   11 ajustar_BAR
+    72: ffffa269     0 NOTYPE  LOCAL  DEFAULT   11 ajustar_siguiente_BAR
+    73: ffffa276     0 NOTYPE  LOCAL  DEFAULT   11 fin_recorrido_pci
+    74: ffffa276     0 NOTYPE  LOCAL  DEFAULT   11 habilitar_modo_texto
+    75: ffffa288     0 NOTYPE  LOCAL  DEFAULT   11 seq_regs_loop
+    76: ffffa2a5     0 NOTYPE  LOCAL  DEFAULT   11 crtc_regs_loop
+    77: ffffa2b6     0 NOTYPE  LOCAL  DEFAULT   11 inicializar_paleta
+    78: ffffa2bb     0 NOTYPE  LOCAL  DEFAULT   11 inicializar_paleta_loop
+    79: ffffa2d7     0 NOTYPE  LOCAL  DEFAULT   11 graphics_regs_loop
+    80: ffffa2f1     0 NOTYPE  LOCAL  DEFAULT   11 attrcon_regs_loop
+    81: ffffa328     0 NOTYPE  LOCAL  DEFAULT   11 ciclo_copia_fonts
+    82: ffffa363     0 NOTYPE  LOCAL  DEFAULT   11 fault_end
+    83: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/init32.asm
+    84: 00000001     0 NOTYPE  LOCAL  DEFAULT  ABS KeyBoard_IRQ
+    85: 000b8000     0 NOTYPE  LOCAL  DEFAULT  ABS VIDEO_BUFFER_ADDR
+    86: 00000004     0 NOTYPE  LOCAL  DEFAULT  ABS GDT_LENGTH
+    87: ffffa364     0 NOTYPE  LOCAL  DEFAULT   12 _idtr
+    88: ffffa36a     0 NOTYPE  LOCAL  DEFAULT   12 _gdtr
+    89: ffffa38a     0 NOTYPE  LOCAL  DEFAULT   12 start32_launcher.stack_in
+    90: ffffa4f2     0 NOTYPE  LOCAL  DEFAULT   12 start32_launcher.halteo
+    91: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/paging.asm
+    92: ffffa4f5     0 NOTYPE  LOCAL  DEFAULT   12 EXTERN__TASK_1_RODATA_PHY
+    93: 00000001     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_PCD_YES
+    94: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_PCD_NO
+    95: 00000001     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_PWT_YES
+    96: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_PWT_NO
+    97: 00000001     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_P_YES
+    98: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_P_NO
+    99: 00000001     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_RW_W
+   100: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_RW_R
+   101: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_US_SUP
+   102: 00000001     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_US_US
+   103: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_D
+   104: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_PAT
+   105: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_G_YES
+   106: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_A
+   107: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS PAG_PS_4K
+   108: 00000000     0 FILE    LOCAL  DEFAULT  ABS functions_rom.c
+   109: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/init_pic.asm
+   110: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/init_IDT.asm
+   111: 0000008f     0 NOTYPE  LOCAL  DEFAULT  ABS ATTR_EXC
+   112: 0000008e     0 NOTYPE  LOCAL  DEFAULT  ABS ATTR_INT
+   113: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/init_timer0.asm
+   114: 00000040     0 NOTYPE  LOCAL  DEFAULT  ABS Chnl0_Data_port
+   115: 00000043     0 NOTYPE  LOCAL  DEFAULT  ABS Mode_Command_register
+   116: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/reset.asm
+   117: 00310000   295 FUNC    GLOBAL DEFAULT    7 Load_KeyBoardTable
+   118: 0010001c     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_NMI
+   119: 001002f5     0 NOTYPE  GLOBAL DEFAULT    3 IRQ01__TIMER0
+   120: 00210000     0 NOTYPE  GLOBAL DEFAULT  ABS __TABLE_KEYBOARD_VMA
+   121: 0078ffff     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_STACK_END
+   122: fffffff0     0 NOTYPE  GLOBAL DEFAULT  ABS __RESET_LMA
+   123: 00100038     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_OF
+   124: 00100062     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_NM
+   125: ffff049c     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_LMA
+   126: ffffac61     0 NOTYPE  GLOBAL DEFAULT   13 init_timer0
+   127: 00200000     0 NOTYPE  GLOBAL DEFAULT    2 TIMER_COUNTER
+   128: 0010009a     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_NP
+   129: 000006ef     0 NOTYPE  GLOBAL DEFAULT  ABS __functions_size
+   130: ffffa970     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_ROM_VMA
+   131: ffff9000     0 NOTYPE  GLOBAL DEFAULT  ABS __INIT_16_LMA
+   132: 000b8000     0 NOTYPE  GLOBAL DEFAULT  ABS __VIDEO_VMA
+   133: ffffa970     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_ROM_LMA
+   134: 00000018     0 NOTYPE  GLOBAL DEFAULT  ABS DS_SEL
+   135: 1ffff000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_STACK_START_PHY
+   136: 003101fb    67 FUNC    GLOBAL DEFAULT    7 buffer_Clear
+   137: 00200005     0 NOTYPE  GLOBAL DEFAULT    2 Digit_Table_Average
+   138: fffffff0     0 NOTYPE  GLOBAL DEFAULT   15 reset
+   139: 00100070     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_DF
+   140: 000503c3    27 FUNC    GLOBAL DEFAULT    6 Get_Entry_DTP
+   141: 1fff8000     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_START_32
+   142: 00050000     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_VMA
+   143: 00200000     0 NOTYPE  GLOBAL DEFAULT  ABS __DATA_PHY
+   144: 00340000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_RODATA_VMA
+   145: 0010000e     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_DB
+   146: 00000100     0 NOTYPE  GLOBAL DEFAULT  ABS __SYS_TABLES_GDT
+   147: ffff9000     0 NOTYPE  GLOBAL DEFAULT  ABS __INIT_16_VMA
+   148: 000000d2     0 NOTYPE  GLOBAL DEFAULT  ABS __TABLE_KEYBOARD_VMA_size
+   149: 002100d1     0 NOTYPE  GLOBAL DEFAULT    4 Keyboard_counter
+   150: ffffa9ac     0 NOTYPE  GLOBAL DEFAULT   13 init_pic
+   151: 001000a8     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_SS
+   152: 00310194   103 FUNC    GLOBAL DEFAULT    7 buffer_Pop
+   153: 00000020     0 NOTYPE  GLOBAL DEFAULT    1 _gdtr
+   154: ffffa9d5     0 NOTYPE  GLOBAL DEFAULT   13 init_IDT
+   155: 00010000     0 NOTYPE  GLOBAL DEFAULT  ABS __PAGE_TABLES_VMA
+   156: 0010008c     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_TS
+   157: 00210000     0 NOTYPE  GLOBAL DEFAULT    4 Load_Keyboard_table_Itsel
+   158: ffff0362     0 NOTYPE  GLOBAL DEFAULT  ABS __TABLE_KEYBOARD_LMA
+   159: ffff9000     0 NOTYPE  GLOBAL DEFAULT   11 init16
+   160: 00100179     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_XM
+   161: 0031023e   264 FUNC    GLOBAL DEFAULT    7 _64bits_average_func
+   162: 00320000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_BSS_VMA
+   163: 0005003c   130 FUNC    GLOBAL DEFAULT    6 IDT_handler_loader
+   164: 00000000     0 NOTYPE  GLOBAL DEFAULT  ABS __SYS_TABLES_VMA
+   165: 00009000     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_START_16
+   166: 00310000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_TEXT_PHY
+   167: 000b8000     0 NOTYPE  GLOBAL DEFAULT  ABS __VIDEO_PHY
+   168: 1fff8000     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_START_32_PHY
+   169: 0010002a     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_BE
+   170: 00000001     0 NOTYPE  GLOBAL DEFAULT  ABS task_1_data_size
+   171: 00220000     0 NOTYPE  GLOBAL DEFAULT    5 kernel32_init
+   172: ffffa370     0 NOTYPE  GLOBAL DEFAULT   12 init32
+   173: 1fff8fff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_END_32
+   174: 00220000     0 NOTYPE  GLOBAL DEFAULT  ABS __KERNEL_32_VMA
+   175: 00050000    60 FUNC    GLOBAL DEFAULT    6 __fast_memcpy
+   176: 00000000     0 NOTYPE  GLOBAL DEFAULT  ABS __SYS_TABLES_PHY
+   177: 00210000     0 NOTYPE  GLOBAL DEFAULT  ABS __TABLE_KEYBOARD_PHY
+   178: 00330000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_DATA_PHY
+   179: 0005056d   267 FUNC    GLOBAL DEFAULT    6 __screen_writing_pf
+   180: 00000010     0 NOTYPE  GLOBAL DEFAULT  ABS CS_SEL_32
+   181: 0078f000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_STACK_START
+   182: 00050510    32 FUNC    GLOBAL DEFAULT    6 Get_Entry_TP
+   183: 00310346   447 FUNC    GLOBAL DEFAULT    7 division_64
+   184: ffff10a9     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_DATA_LMA
+   185: 00200018     0 NOTYPE  GLOBAL DEFAULT    2 Flag_Task_1
+   186: 00100046     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_BR
+   187: ffff0b8b     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_TEXT_LMA
+   188: 00330000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_DATA_VMA
+   189: 0020001a     0 NOTYPE  GLOBAL DEFAULT    2 PF_lin_addrs
+   190: 00000019     0 NOTYPE  GLOBAL DEFAULT  ABS TASK_1_bss_size
+   191: 00100054     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_UD
+   192: 00050678   119 FUNC    GLOBAL DEFAULT    6 Screen_write_string
+   193: 000003ff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_SIZE_32
+   194: 00009fff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_END_16
+   195: 00100000     0 NOTYPE  GLOBAL DEFAULT  ABS __ISR_AND_KEYBOARD_VMA
+   196: ffff0434     0 NOTYPE  GLOBAL DEFAULT  ABS __KERNEL_32_LMA
+   197: 00000000     0 NOTYPE  GLOBAL DEFAULT  ABS __SYS_TABLES_IDT
+   198: 00010000     0 NOTYPE  GLOBAL DEFAULT  ABS __PAGE_TABLES_PHY
+   199: 00000008     0 NOTYPE  GLOBAL DEFAULT  ABS CS_SEL_16
+   200: fffffff0     0 NOTYPE  GLOBAL DEFAULT  ABS __RESET_VMA
+   201: 00310000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_TEXT_VMA
+   202: ffff0041     0 NOTYPE  GLOBAL DEFAULT  ABS __ISR_AND_KEYBOARD_LMA
+   203: 000500be   534 FUNC    GLOBAL DEFAULT    6 Screen_Writing
+   204: 00000068     0 NOTYPE  GLOBAL DEFAULT  ABS kernel32_code_size
+   205: 00050530    61 FUNC    GLOBAL DEFAULT    6 LOAD_CR3
+   206: 0010015d     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_AC
+   207: ffffa364     0 NOTYPE  GLOBAL DEFAULT  ABS __INIT_32_VMA
+   208: 000502d4   239 FUNC    GLOBAL DEFAULT    6 __load_DTP_entry
+   209: 00200019     0 NOTYPE  GLOBAL DEFAULT    2 PF_error_code
+   210: 00000505     0 NOTYPE  GLOBAL DEFAULT  ABS TASK_1_TEXT_size
+   211: 0000001b     0 NOTYPE  GLOBAL DEFAULT  ABS __DATA__size
+   212: 00310127   109 FUNC    GLOBAL DEFAULT    7 __Keyboard_Buffer_func
+   213: ffffa4f5     0 NOTYPE  GLOBAL DEFAULT   12 go_paging
+   214: 00000026     0 NOTYPE  GLOBAL DEFAULT  ABS __sys_tables_size
+   215: 1fffffff     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_STACK_END_PHY
+   216: ffff10aa     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_RODATA_LMA
+   217: 00340000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_RODATA_PHY
+   218: 001000c4     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_PF
+   219: 00320000     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_BSS_PHY
+   220: 00100000     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_DE
+   221: 00200001     0 NOTYPE  GLOBAL DEFAULT    2 Screen_pointer
+   222: 00100000     0 NOTYPE  GLOBAL DEFAULT  ABS __ISR_AND_KEYBOARD_PHY
+   223: 001000b6     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_GP
+   224: 00050000     0 NOTYPE  GLOBAL DEFAULT  ABS __FUNCTIONS_PHY
+   225: 00200000     0 NOTYPE  GLOBAL DEFAULT  ABS __DATA_VMA
+   226: 00000001     0 NOTYPE  GLOBAL DEFAULT  ABS task_1_rodata_size
+   227: 000503de   306 FUNC    GLOBAL DEFAULT    6 __load_TP_entry
+   228: 0010014f     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_MF
+   229: 00220000     0 NOTYPE  GLOBAL DEFAULT  ABS __KERNEL_32_PHY
+   230: ffffa364     0 NOTYPE  GLOBAL DEFAULT  ABS __INIT_32_LMA
+   231: ffff0000     0 NOTYPE  GLOBAL DEFAULT  ABS __SYS_TABLES_LMA
+   232: 00000068     0 NOTYPE  GLOBAL DEFAULT  ABS __codigo_kernel32_size
+   233: 00330000     1 OBJECT  GLOBAL DEFAULT    9 dummy_bss
+   234: ffff1090     0 NOTYPE  GLOBAL DEFAULT  ABS __TASK_1_BSS_LMA
+   235: 002100be     0 NOTYPE  GLOBAL DEFAULT    4 Keyboard_Buffer_Itself
+   236: ffffa970    60 FUNC    GLOBAL DEFAULT   13 __fast_memcpy_rom
+   237: 1fff8fff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_END_32_PHY
+   238: 00340000     1 OBJECT  GLOBAL DEFAULT   10 global_rodata
+   239: 0010007e     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_CoS
+   240: 00100187     0 NOTYPE  GLOBAL DEFAULT    3 IRQ00__Key_Handler
+   241: ffffa370     0 NOTYPE  GLOBAL DEFAULT   12 start32_launcher
+   242: ffff0026     0 NOTYPE  GLOBAL DEFAULT  ABS __DATA_LMA
+   243: 0010016b     0 NOTYPE  GLOBAL DEFAULT    3 EXCEPTION_MC
+   244: 00000321     0 NOTYPE  GLOBAL DEFAULT  ABS __ISR_AND_KEYBOARD_CODE_s
+
+No se encontró información de versión en este fichero.

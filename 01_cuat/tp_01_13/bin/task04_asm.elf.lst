@@ -1,0 +1,65 @@
+     1                                  %include "inc/defines.h" 
+     1                              <1> 
+     2                              <1> %define PORT_A_8042    0x60
+     3                              <1> %define CTRL_PORT_8042 0x64
+     4                              <1> %define KEYB_DIS       0xAD
+     5                              <1> %define KEYB_EN        0xAE
+     6                              <1> %define READ_OUT_8042  0xD0
+     7                              <1> %define WRITE_OUT_8042 0xD1
+     8                              <1> 
+     9                              <1> 
+    10                              <1> %define _KEY_1     0x02
+    11                              <1> %define _KEY_2     0x03
+    12                              <1> %define _KEY_3     0x04
+    13                              <1> %define _KEY_4     0x05
+    14                              <1> %define _KEY_5     0x06
+    15                              <1> %define _KEY_6     0x07
+    16                              <1> %define _KEY_7     0x08
+    17                              <1> %define _KEY_8     0x09
+    18                              <1> %define _KEY_9     0x0A
+    19                              <1> %define _KEY_0     0x0B
+    20                              <1> 
+    21                              <1> %define _KEY_ENTER 0x1C
+    22                              <1> 
+    23                              <1> %define _KEY_A     0x1E
+    24                              <1> %define _KEY_B     0x30
+    25                              <1> %define _KEY_C     0x2E
+    26                              <1> %define _KEY_D     0x20
+    27                              <1> %define _KEY_E     0x12
+    28                              <1> %define _KEY_F     0x21
+    29                              <1> %define _KEY_G     0x22
+    30                              <1> %define _KEY_H     0x23
+    31                              <1> %define _KEY_I     0x17
+    32                              <1> %define _KEY_J     0x24
+    33                              <1> %define _KEY_K     0x25
+    34                              <1> %define _KEY_L     0x26
+    35                              <1> %define _KEY_M     0x32
+    36                              <1> %define _KEY_N     0x31
+    37                              <1> %define _KEY_O     0x18
+    38                              <1> %define _KEY_P     0x19
+    39                              <1> %define _KEY_Q     0x10
+    40                              <1> %define _KEY_R     0x13
+    41                              <1> %define _KEY_S     0x1F
+    42                              <1> %define _KEY_T     0x14
+    43                              <1> %define _KEY_U     0x16
+    44                              <1> %define _KEY_V     0x2F
+    45                              <1> %define _KEY_W     0x11
+    46                              <1> %define _KEY_X     0x2D
+    47                              <1> %define _KEY_Y     0x15
+    48                              <1> %define _KEY_Z     0x2C
+    49                              <1> 
+    50                              <1> SYS_CALL_HALT     EQU     0
+    51                              <1> SYS_CALL_READ     EQU     1
+    52                              <1> SYS_CALL_WRITE    EQU     2
+    53                              <1> SYS_CALL_SCREEN   EQU     3
+    54                              <1> 
+    55                              <1>  
+     2                                  section .task04_functions
+     3                                  USE32
+     4                                  
+     5                                  GLOBAL TASK4_LABEL
+     6                                  
+     7                                  TASK4_LABEL:
+     8                                      
+     9 00000000 F4                          hlt
+    10 00000001 EBFD                        jmp TASK4_LABEL

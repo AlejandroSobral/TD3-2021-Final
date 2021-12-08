@@ -1,0 +1,632 @@
+     1                                  SECTION .ISR_AND_KEYBOARD
+     2                                  
+     3                                  %include "inc/defines.h" 
+     1                              <1> 
+     2                              <1> %define PORT_A_8042    0x60
+     3                              <1> %define CTRL_PORT_8042 0x64
+     4                              <1> %define KEYB_DIS       0xAD
+     5                              <1> %define KEYB_EN        0xAE
+     6                              <1> %define READ_OUT_8042  0xD0
+     7                              <1> %define WRITE_OUT_8042 0xD1
+     8                              <1> 
+     9                              <1> 
+    10                              <1> %define TECLA_1     0x02
+    11                              <1> %define TECLA_2     0x03
+    12                              <1> %define TECLA_3     0x04
+    13                              <1> %define TECLA_4     0x05
+    14                              <1> %define TECLA_5     0x06
+    15                              <1> %define TECLA_6     0x07
+    16                              <1> %define TECLA_7     0x08
+    17                              <1> %define TECLA_8     0x09
+    18                              <1> %define TECLA_9     0x0A
+    19                              <1> %define TECLA_0     0x0B
+    20                              <1> 
+    21                              <1> %define TECLA_ENTER 0x1C
+    22                              <1> 
+    23                              <1> %define TECLA_A     0x1E
+    24                              <1> %define TECLA_B     0x30
+    25                              <1> %define TECLA_C     0x2E
+    26                              <1> %define TECLA_D     0x20
+    27                              <1> %define TECLA_E     0x12
+    28                              <1> %define TECLA_F     0x21
+    29                              <1> %define TECLA_G     0x22
+    30                              <1> %define TECLA_H     0x23
+    31                              <1> %define TECLA_I     0x17
+    32                              <1> %define TECLA_J     0x24
+    33                              <1> %define TECLA_K     0x25
+    34                              <1> %define TECLA_L     0x26
+    35                              <1> %define TECLA_M     0x32
+    36                              <1> %define TECLA_N     0x31
+    37                              <1> %define TECLA_O     0x18
+    38                              <1> %define TECLA_P     0x19
+    39                              <1> %define TECLA_Q     0x10
+    40                              <1> %define TECLA_R     0x13
+    41                              <1> %define TECLA_S     0x1F
+    42                              <1> %define TECLA_T     0x14
+    43                              <1> %define TECLA_U     0x16
+    44                              <1> %define TECLA_V     0x2F
+    45                              <1> %define TECLA_W     0x11
+    46                              <1> %define TECLA_X     0x2D
+    47                              <1> %define TECLA_Y     0x15
+    48                              <1> %define TECLA_Z     0x2C
+    49                              <1> 
+    50                              <1>  
+     4                                  %include "inc/processor-flags.h" 
+     1                              <1> %define X86_CR0_PE      0x00000001 ;/* Protectede mode enable*/
+     2                              <1> %define X86_CR0_MP      0x00000002 ;/* Monitor coProcessor*/
+     3                              <1> %define X86_CR0_EM      0x00000004 ;/* Emulation*/
+     4                              <1> %define X86_CR0_TS      0x00000008 ;/* Task Switched*/
+     5                              <1> %define X86_CR0_ET      0x00000010 ;/* Extension Type*/
+     6                              <1> %define X86_CR0_NE      0x00000020 ;/* Numeric Error*/
+     7                              <1> %define X86_CR0_WP      0x00010000 ;/* Write Protect*/
+     8                              <1> %define X86_CR0_AM      0x00040000 ;/* Alignment Mask*/
+     9                              <1> %define X86_CR0_NW      0x20000000 ;/* Not Write-through*/
+    10                              <1> %define X86_CR0_CD      0x40000000 ;/* Cache Disable*/
+    11                              <1> %define X86_CR0_PG      0x80000000 ;/* PaGine*/
+    12                              <1> 
+    13                              <1> %define IDLE            0x00000000;
+    14                              <1> %define WAITING         0x00000001;
+    15                              <1> %define RUNNING         0x00000002;
+     5                                  
+     6                                  EXTERN __Keyboard_Buffer_func
+     7                                  EXTERN Keyboard_Buffer_Itself
+     8                                  EXTERN Load_KeyBoardTable
+     9                                  EXTERN Load_Keyboard_table_Itself
+    10                                  EXTERN Keyboard_counter
+    11                                  EXTERN Flag_Task_1
+    12                                  EXTERN PF_error_code
+    13                                  EXTERN Screen_Writing_string
+    14                                  EXTERN __PAGE_FAULT_PHY
+    15                                  EXTERN Basic_Scheduler
+    16                                  EXTERN __MMX_TASK2
+    17                                  EXTERN __MMX_TASK3
+    18                                  EXTERN SCH_ACTUAL_TASK
+    19                                  Key_times_to_load EQU 16
+    20                                  
+    21                                  PAG_PCD_YES equ 1       ; Cached                         
+    22                                  PAG_PCD_NO  equ 0       ; No-cached
+    23                                  PAG_PWT_YES equ 1       ; 1 to be write on Cache & Ram   
+    24                                  PAG_PWT_NO  equ 0       ; 0 
+    25                                  PAG_P_YES   equ 1       ; 1 Present
+    26                                  PAG_P_NO    equ 0       ; 0 No presente
+    27                                  PAG_RW_W    equ 1       ; 1 Read_Write
+    28                                  PAG_RW_R    equ 0       ; 0 Read only
+    29                                  PAG_US_SUP  equ 0       ; 0 Supervisor
+    30                                  PAG_US_US   equ 1       ; 1 User  
+    31                                  PAG_D       equ 0       ; Modify at page
+    32                                  PAG_PAT     equ 0       ; PAT                   
+    33                                  PAG_G_YES   equ 0       ; Global                 
+    34                                  PAG_A       equ 0       ; Accesed
+    35                                  PAG_PS_4K   equ 0       ; 4KB as PageSize
+    36                                  
+    37                                  GLOBAL EXCEPTION_DE     ; 0
+    38                                  GLOBAL EXCEPTION_DB     ; 1
+    39                                  GLOBAL EXCEPTION_NMI    ; 2
+    40                                  GLOBAL EXCEPTION_BE     ; 3
+    41                                  GLOBAL EXCEPTION_OF     ; 4
+    42                                  GLOBAL EXCEPTION_BR     ; 5
+    43                                  GLOBAL EXCEPTION_UD     ; 6
+    44                                  GLOBAL EXCEPTION_NM     ; 7
+    45                                  GLOBAL EXCEPTION_DF     ; 8
+    46                                  GLOBAL EXCEPTION_CoS    ; 9
+    47                                  GLOBAL EXCEPTION_TS     ; 10
+    48                                  GLOBAL EXCEPTION_NP     ; 11
+    49                                  GLOBAL EXCEPTION_SS     ; 12
+    50                                  GLOBAL EXCEPTION_GP     ; 13
+    51                                  GLOBAL EXCEPTION_PF     ; 14
+    52                                  GLOBAL EXCEPTION_MF     ; 16
+    53                                  GLOBAL EXCEPTION_AC     ; 17
+    54                                  GLOBAL EXCEPTION_MC     ; 18
+    55                                  GLOBAL EXCEPTION_XM     ; 19
+    56                                  GLOBAL IRQ00__Key_Handler
+    57                                  GLOBAL IRQ01__TIMER0
+    58                                  GLOBAL Timer_fin
+    59                                  
+    60                                  EXTERN __SYS_TABLES_IDT
+    61                                  EXTERN __SYS_TABLES_GDT
+    62                                  EXTERN DS_SEL
+    63                                  EXTERN IDT_handler_loader
+    64                                  EXTERN CS_SEL_32
+    65                                  EXTERN TIMER_COUNTER
+    66                                  EXTERN PF_lin_addrs
+    67                                  EXTERN __screen_writing_pf
+    68                                  EXTERN Screen_pointer
+    69                                  EXTERN __PAGE_TABLES_PHY
+    70                                  EXTERN Basic_Scheduler
+    71                                  EXTERN buffer_Clear
+    72                                  
+    73                                  EXTERN __load_DTP_entry
+    74                                  EXTERN __load_TP_entry
+    75                                  
+    76                                  TASK2 EQU 2
+    77                                  TASK3 EQU 3
+    78                                  
+    79                                  %define PORT_A_8042    0x60
+    80                                  %define WRITE_OUT_8042 0xD1
+    81                                  
+    82                                  EXCEPTION_DE:                   ; Divide Error Exception
+    83 00000000 B800000000                  mov eax, 0x00
+    84 00000005 89C2                        mov edx, eax
+    85 00000007 6687DB                      xchg bx,bx
+    86 0000000A F4                          hlt
+    87 0000000B EBF3                        jmp EXCEPTION_DE
+    88 0000000D C3                          ret
+    89                                  
+    90                                  EXCEPTION_DB:                   ; Debug Exception
+    91 0000000E B801000000                  mov eax, 0x01
+    92 00000013 89C2                        mov edx, eax
+    93 00000015 6687DB                      xchg bx,bx
+    94 00000018 F4                          hlt
+    95 00000019 EBF3                        jmp EXCEPTION_DB
+    96 0000001B C3                          ret
+    97                                  
+    98                                  EXCEPTION_NMI:                  ; Non maskable interrupt
+    99 0000001C B802000000                  mov eax, 0x02
+   100 00000021 89C2                        mov edx, eax
+   101 00000023 6687DB                      xchg bx,bx
+   102 00000026 F4                          hlt
+   103 00000027 EBF3                        jmp EXCEPTION_NMI
+   104 00000029 C3                          ret
+   105                                  
+   106                                  EXCEPTION_BE:                   ; Breakpoint Exception
+   107 0000002A B803000000                  mov eax, 0x03
+   108 0000002F 89C2                        mov edx, eax
+   109 00000031 6687DB                      xchg bx,bx
+   110 00000034 F4                          hlt
+   111 00000035 EBF3                        jmp EXCEPTION_BE
+   112 00000037 C3                          ret
+   113                                  
+   114                                  EXCEPTION_OF:                   ; Overflow Exception
+   115 00000038 B804000000                  mov eax, 0x04
+   116 0000003D 89C2                        mov edx, eax
+   117 0000003F 6687DB                      xchg bx,bx
+   118 00000042 F4                          hlt
+   119 00000043 EBF3                        jmp EXCEPTION_OF
+   120 00000045 C3                          ret
+   121                                  
+   122                                  EXCEPTION_BR:                   ; Bound Range Exception
+   123 00000046 B805000000                  mov eax, 0x05
+   124 0000004B 89C2                        mov edx, eax
+   125 0000004D 6687DB                      xchg bx,bx
+   126 00000050 F4                          hlt
+   127 00000051 EBF3                        jmp EXCEPTION_BR
+   128 00000053 C3                          ret
+   129                                  
+   130                                  EXCEPTION_UD:                   ; Invalid Opcode Exception
+   131 00000054 B806000000                  mov eax, 0x06
+   132 00000059 89C2                        mov edx, eax
+   133 0000005B 6687DB                      xchg bx,bx
+   134 0000005E F4                          hlt
+   135 0000005F EBF3                        jmp EXCEPTION_UD
+   136 00000061 C3                          ret
+   137                                  
+   138                                  EXCEPTION_NM:                   ; Device Not Available Exception
+   139                                  
+   140 00000062 60                          PUSHAD
+   141 00000063 B807000000                  mov eax, 0x07
+   142 00000068 0F06                        clts        
+   143 0000006A 803D[00000000]02            cmp byte [SCH_ACTUAL_TASK], TASK2
+   144 00000071 740B                        je LOAD_CONTEXT_TASK2
+   145                                  
+   146 00000073 803D[00000000]03            cmp byte [SCH_ACTUAL_TASK], TASK3
+   147 0000007A 740C                        je LOAD_CONTEXT_TASK3
+   148                                  
+   149 0000007C EB12                        jmp END_NM_ITR
+   150                                  
+   151                                  LOAD_CONTEXT_TASK2:
+   152 0000007E B8[00000000]                mov eax, __MMX_TASK2
+   153 00000083 0FAE08                      FXRSTOR [eax]
+   154 00000086 EB08                        jmp END_NM_ITR
+   155                                  
+   156                                  LOAD_CONTEXT_TASK3:
+   157 00000088 B8[00000000]                mov eax, __MMX_TASK3
+   158 0000008D 0FAE08                      FXRSTOR [eax]
+   159                                  
+   160                                  END_NM_ITR:
+   161 00000090 61                          POPAD
+   162 00000091 CF                          iret
+   163                                  
+   164                                  
+   165                                  EXCEPTION_DF:                   ; Double Fault Exception
+   166 00000092 B808000000                  mov eax, 0x08
+   167 00000097 89C2                        mov edx, eax
+   168 00000099 6687DB                      xchg bx,bx
+   169 0000009C F4                          hlt
+   170 0000009D EBF3                        jmp EXCEPTION_DF
+   171 0000009F C3                          ret
+   172                                  
+   173                                  EXCEPTION_CoS:                   ; Coprocessor Segment Overrun Exception
+   174 000000A0 B809000000                  mov eax, 0x09
+   175 000000A5 89C2                        mov edx, eax
+   176 000000A7 6687DB                      xchg bx,bx
+   177 000000AA F4                          hlt
+   178 000000AB EBF3                        jmp EXCEPTION_CoS
+   179 000000AD C3                          ret
+   180                                  
+   181                                  EXCEPTION_TS:                   ; Invalid TSS Exception
+   182 000000AE B80A000000                  mov eax, 0x0A
+   183 000000B3 89C2                        mov edx, eax
+   184 000000B5 6687DB                      xchg bx,bx
+   185 000000B8 F4                          hlt
+   186 000000B9 EBF3                        jmp EXCEPTION_TS
+   187 000000BB C3                          ret
+   188                                  
+   189                                  EXCEPTION_NP:                   ; No Present Segment Exception
+   190 000000BC B80B000000                  mov eax, 0x0B
+   191 000000C1 89C2                        mov edx, eax
+   192 000000C3 6687DB                      xchg bx,bx
+   193 000000C6 F4                          hlt
+   194 000000C7 EBF3                        jmp EXCEPTION_NP
+   195 000000C9 C3                          ret
+   196                                  
+   197                                  EXCEPTION_SS:                   ; Stack Fault Exception
+   198 000000CA B80C000000                  mov eax, 0x0C
+   199 000000CF 89C2                        mov edx, eax
+   200 000000D1 6687DB                      xchg bx,bx
+   201 000000D4 F4                          hlt
+   202 000000D5 EBF3                        jmp EXCEPTION_SS
+   203 000000D7 C3                          ret
+   204                                  
+   205                                  EXCEPTION_GP:                   ; General Protection Fault Exception
+   206 000000D8 B80D000000                  mov eax, 0x0D
+   207 000000DD 89C2                        mov edx, eax
+   208 000000DF 6687DB                      xchg bx,bx
+   209 000000E2 F4                          hlt
+   210 000000E3 EBF3                        jmp EXCEPTION_GP
+   211 000000E5 C3                          ret
+   212                                  
+   213                                  EXCEPTION_PF:                   ; Page Fault Exception
+   214                                  
+   215                                  
+   216                                  ;https://xem.github.io/minix86/manual/intel-x86-and-64-manual-vol3/o_fe12b1e2a880e0ce-227.html
+   217                                      ; CR2 content show the memory
+   218                                      ; Bit0 -> Present -> 0 = Non-present page
+   219                                      ; Bit0 -> Present -> 1 = Page-level protection violation
+   220                                      ; Bit1 -> W/R     -> 0 = Access causing the fault was a read
+   221                                      ; Bit1 -> W/R     -> 1 = Access causing the fault was a write
+   222                                      ; Bit2 -> U/S     -> 0 = A Supervisor-mode access caused the fault
+   223                                      ; Bit2 -> U/S     -> 1 = A User-mode access caused the fault
+   224                                      ; Bit3 -> RSVD    -> 0 = Fault was not caused by reserved bit violation
+   225                                      ; Bit4 -> RSVD    -> 1 = Fault was caused by a reserv bit set to 1 in some paging structure entry.
+   226                                      ; Bit5 -> I/D     -> 0 = Fault not caused by an instruction fetch
+   227                                      ; Bit5 -> I/D     -> 1 = Fault caused by an instruction fecth
+   228 000000E6 FA                          cli                                ; Turn off interrputs
+   229 000000E7 6687DB                      xchg bx,bx                    ;                                     
+   230 000000EA 60                          pusha                              ; Store g.p. registers
+   231 000000EB 0F20D0                      mov eax, cr2                       ;Store CR2 as requested
+   232 000000EE A3[00000000]                mov [PF_lin_addrs], eax      ;Store linear addrs
+   233 000000F3 8B5C2420                    mov ebx, [esp + 32]                ;Get error code
+   234 000000F7 891D[00000000]              mov [PF_error_code], ebx     ;Store error code
+   235 000000FD 89D8                        mov eax, ebx; Compare PF_error_code 
+   236                                  
+   237                                  
+   238 000000FF 83E01F                      and eax, 0x1F       ;Mask to take B4-B0
+   239 00000102 83F800                      cmp eax,0           ; Cmp according upper info          
+   240 00000105 741B                        je PF_P             ; No present page                                   
+   241 00000107 83F801                      cmp eax,1                
+   242 0000010A 0F8486000000                je PF_RW                                        
+   243 00000110 83F802                      cmp eax,2           
+   244 00000113 0F8491000000                je PF_US                                    
+   245 00000119 83F804                      cmp eax,4                                      
+   246 0000011C 0F849C000000                je PF_ID
+   247                                  PF_P:
+   248                                  
+   249 00000122 55                          push ebp
+   250 00000123 89E5                        mov ebp,esp
+   251 00000125 FF35[00000000]              push dword [PF_error_code] 
+   252 0000012B E8(00000000)                call __screen_writing_pf
+   253 00000130 C9                          leave
+   254                                  
+   255                                      ; Here I should set paging off, and load the no-paged add
+   256                                  
+   257                                  
+   258 00000131 0F20C0                      mov  eax, cr0 
+   259 00000134 25FFFFFF7F                  and  eax, (X86_CR0_PG - 1) 
+   260 00000139 0F22C0                      mov  cr0, eax  
+   261                                  
+   262                                  
+   263                                  
+   264                                      ; -> Load DTP (Page Table Entry)
+   265 0000013C 55                          push    ebp
+   266 0000013D 89E5                        mov     ebp, esp
+   267 0000013F 6A01                        push    PAG_P_YES                           ; Present. P = 1 on memory. P=0, out of mem.
+   268 00000141 6A01                        push    PAG_RW_W                            ; Readable / Writable: RO = 0; W = 1;
+   269 00000143 6A00                        push    PAG_US_SUP                          ; User / Supervisor: Set page privileges, Kernel = 0; User = 1
+   270 00000145 6A00                        push    PAG_PWT_NO                          ; Page-Level Write Through. Cache writing mode
+   271 00000147 6A00                        push    PAG_PCD_NO                          ; Page-Level Cache Disable. Set page into non-cached memory.
+   272 00000149 6A00                        push    PAG_A                               ; Accesed. To be write each time page is used.
+   273 0000014B 6A00                        push    PAG_PS_4K                           ; Page Size: Set 0 for 4kB page, 1 for 4 Mb
+   274 0000014D FF35[00000000]              push    dword[PF_lin_addrs]                       ; VMA Adds
+   275 00000153 68[00000000]                push    dword(__PAGE_TABLES_PHY)            ; Start itself
+   276 00000158 E8(00000000)                call    __load_DTP_entry
+   277 0000015D C9                          leave
+   278                                  
+   279                                  
+   280                                  
+   281                                      ; -> Load (Page Table Entry)
+   282 0000015E 55                          push    ebp
+   283 0000015F 89E5                        mov     ebp, esp
+   284 00000161 6A01                        push    PAG_P_YES
+   285 00000163 6A01                        push    PAG_RW_W
+   286 00000165 6A00                        push    PAG_US_SUP
+   287 00000167 6A00                        push    PAG_PWT_NO
+   288 00000169 6A00                        push    PAG_PCD_NO
+   289 0000016B 6A00                        push    PAG_A
+   290 0000016D 6A00                        push    PAG_D
+   291 0000016F 6A00                        push    PAG_PAT
+   292 00000171 6A00                        push    PAG_G_YES
+   293 00000173 68000000A0                  push    dword(0xA0000000) ;Phy where is indicated to page. No used any more.
+   294 00000178 FF35[00000000]              push    dword[PF_lin_addrs]  ;VMA've cause the pF
+   295 0000017E 68[00000000]                push    dword(__PAGE_TABLES_PHY) ;TP Init, After DTP 
+   296 00000183 E8(00000000)                call    __load_TP_entry
+   297 00000188 C9                          leave
+   298                                  
+   299                                      ; Paging turn on
+   300 00000189 0F20C0                      mov   eax, cr0 
+   301 0000018C 0D00000080                  or    eax, X86_CR0_PG
+   302 00000191 0F22C0                      mov   cr0, eax  
+   303                                  
+   304 00000194 EB3C                        jmp END_PF
+   305                                      
+   306                                  PF_RW:
+   307 00000196 55                          push ebp
+   308 00000197 89E5                        mov ebp,esp
+   309 00000199 FF35[00000000]              push dword [PF_error_code]   
+   310 0000019F E8(00000000)                call __screen_writing_pf
+   311 000001A4 C9                          leave
+   312 000001A5 6687DB                      xchg bx,bx    
+   313                                  
+   314                                  
+   315                                  
+   316 000001A8 EB28                        jmp END_PF
+   317                                      
+   318                                  PF_US:
+   319                                  
+   320 000001AA 55                          push ebp
+   321 000001AB 89E5                        mov ebp,esp
+   322 000001AD FF35[00000000]              push dword [PF_error_code]  
+   323 000001B3 E8(00000000)                call __screen_writing_pf
+   324 000001B8 C9                          leave
+   325 000001B9 6687DB                      xchg bx,bx
+   326 000001BC EB14                        jmp END_PF
+   327                                      
+   328                                  PF_ID:
+   329 000001BE 6687DB                      xchg bx,bx
+   330 000001C1 55                          push ebp
+   331 000001C2 89E5                        mov ebp,esp
+   332 000001C4 FF35[00000000]              push dword [PF_error_code] 
+   333 000001CA E8(00000000)                call __screen_writing_pf
+   334 000001CF C9                          leave
+   335 000001D0 EB00                        jmp END_PF
+   336                                  
+   337                                  
+   338                                  
+   339                                  END_PF:
+   340                                      
+   341 000001D2 B020                        MOV al, 0x20 ;Send END of interrupt to PIC
+   342 000001D4 E620                        OUT 0x20, al
+   343 000001D6 61                          POPAD ;Pop all general purp registers to stack
+   344 000001D7 58                          pop eax
+   345 000001D8 FB                          sti
+   346 000001D9 CF                          iret     
+   347                                      
+   348                                  
+   349                                  
+   350                                  
+   351                                  
+   352                                  EXCEPTION_MF:                   ; FPU Floating Point Error Exception
+   353 000001DA B810000000                  mov eax, 0x10
+   354 000001DF 89C2                        mov edx, eax
+   355 000001E1 6687DB                      xchg bx,bx
+   356 000001E4 F4                          hlt
+   357 000001E5 EBF3                        jmp EXCEPTION_MF
+   358 000001E7 C3                          ret
+   359                                  
+   360                                  EXCEPTION_AC:                   ; Aligment Check Exception
+   361 000001E8 B811000000                  mov eax, 0x11
+   362 000001ED 89C2                        mov edx, eax
+   363 000001EF 6687DB                      xchg bx,bx
+   364 000001F2 F4                          hlt
+   365 000001F3 EBF3                        jmp EXCEPTION_AC
+   366 000001F5 C3                          ret
+   367                                  
+   368                                  EXCEPTION_MC:                   ; Machine Check Exception
+   369 000001F6 B812000000                  mov eax, 0x12
+   370 000001FB 89C2                        mov edx, eax
+   371 000001FD 6687DB                      xchg bx,bx
+   372 00000200 F4                          hlt
+   373 00000201 EBF3                        jmp EXCEPTION_MC
+   374 00000203 C3                          ret
+   375                                  
+   376                                  EXCEPTION_XM:                   ; SIMD Floating Point Exception
+   377 00000204 B813000000                  mov eax, 0x13
+   378 00000209 89C2                        mov edx, eax
+   379 0000020B 6687DB                      xchg bx,bx
+   380 0000020E F4                          hlt
+   381 0000020F EBF3                        jmp EXCEPTION_XM
+   382 00000211 C3                          ret
+   383                                  
+   384                                  IRQ00__Key_Handler:                   ; Keyboard IRQ Handler
+   385                                  
+   386 00000212 60                          PUSHAD ; Push all general purp registers to stack
+   387 00000213 E460                        in al, PORT_A_8042 ; Read key buffer
+   388 00000215 88C3                        mov bl, al      ; Store al value
+   389 00000217 20C0                        and al, al ; Compare signal between al & al
+   390 00000219 0F8853010000                JS End_Keyboard ;If the key was released, nothing to do
+   391                                  
+   392 0000021F 8B0D[00000000]              mov dword ecx, [Keyboard_counter]
+   393 00000225 41                          inc ecx
+   394 00000226 890D[00000000]              mov dword [Keyboard_counter], ecx ; Store the Keyboard_counter
+   395 0000022C 6683F910                    cmp cx, Key_times_to_load; #Compare with 17
+   396                                  
+   397 00000230 0F8412010000                JE Buffer_full;
+   398                                  
+   399 00000236 80FB0B                      cmp bl, TECLA_0
+   400 00000239 7457                        je K_0
+   401                                  
+   402 0000023B 80FB02                      cmp bl, TECLA_1
+   403 0000023E 7466                        je K_1
+   404                                  
+   405 00000240 80FB03                      cmp bl, TECLA_2
+   406 00000243 7475                        je K_2
+   407                                  
+   408 00000245 80FB04                      cmp bl, TECLA_3
+   409 00000248 0F8480000000                je K_3
+   410                                  
+   411 0000024E 80FB05                      cmp bl, TECLA_4
+   412 00000251 0F848B000000                je K_4
+   413                                  
+   414 00000257 80FB06                      cmp bl, TECLA_5
+   415 0000025A 0F8493000000                je K_5
+   416                                  
+   417 00000260 80FB07                      cmp bl, TECLA_6
+   418 00000263 0F849B000000                je K_6
+   419                                  
+   420 00000269 80FB08                      cmp bl, TECLA_7
+   421 0000026C 0F84A3000000                je K_7
+   422                                  
+   423 00000272 80FB09                      cmp bl, TECLA_8
+   424 00000275 0F84AB000000                je K_8
+   425                                  
+   426 0000027B 80FB0A                      cmp bl, TECLA_9
+   427 0000027E 0F84B3000000                je K_9 
+   428                                  
+   429 00000284 80FB1C                      cmp bl, TECLA_ENTER
+   430 00000287 0F84C7000000                je K_ENTER 
+   431                                  
+   432                                      
+   433                                  
+   434 0000028D E9E0000000                  jmp End_Keyboard ; Any other key should be ignored.
+   435                                  
+   436                                  
+   437                                  
+   438                                  
+   439                                  K_0:   ; Process any value key mean to set offset for each value..
+   440                                          ; Instead, create a one-on-one label for each key..Love u assm
+   441 00000292 6A00                        push 0x00
+   442 00000294 68[00000000]                push dword Keyboard_Buffer_Itself
+   443 00000299 E8(00000000)                call __Keyboard_Buffer_func
+   444 0000029E 83C408                      add esp,8; 
+   445 000002A1 E9CC000000                  jmp End_Keyboard
+   446                                  
+   447                                  K_1:   
+   448                                      ;xchg bx, bx
+   449 000002A6 6A01                        push 0x01
+   450 000002A8 68[00000000]                push dword Keyboard_Buffer_Itself
+   451 000002AD E8(00000000)                call __Keyboard_Buffer_func
+   452 000002B2 83C408                      add esp,8;
+   453 000002B5 E9B8000000                  jmp End_Keyboard
+   454                                  
+   455                                  K_2:   
+   456                                      
+   457 000002BA 6A02                        push 0x02
+   458 000002BC 68[00000000]                push dword Keyboard_Buffer_Itself
+   459 000002C1 E8(00000000)                call __Keyboard_Buffer_func
+   460 000002C6 83C408                      add esp,8; 
+   461 000002C9 E9A4000000                  jmp End_Keyboard
+   462                                  
+   463                                  K_3:   
+   464                                      
+   465 000002CE 6A03                        push 0x03
+   466 000002D0 68[00000000]                push dword Keyboard_Buffer_Itself
+   467 000002D5 E8(00000000)                call __Keyboard_Buffer_func
+   468 000002DA 83C408                      add esp,8; 
+   469 000002DD E990000000                  jmp End_Keyboard
+   470                                  
+   471                                  K_4:   
+   472                                      
+   473 000002E2 6A04                        push 0x04
+   474 000002E4 68[00000000]                push dword Keyboard_Buffer_Itself
+   475 000002E9 E8(00000000)                call __Keyboard_Buffer_func
+   476 000002EE 83C408                      add esp,8;
+   477 000002F1 EB7F                        jmp End_Keyboard
+   478                                  
+   479                                  K_5:   
+   480                                      
+   481 000002F3 6A05                        push 0x05
+   482 000002F5 68[00000000]                push dword Keyboard_Buffer_Itself
+   483 000002FA E8(00000000)                call __Keyboard_Buffer_func
+   484 000002FF 83C408                      add esp,8; 
+   485 00000302 EB6E                        jmp End_Keyboard
+   486                                      
+   487                                  K_6:   
+   488 00000304 6A06                        push 0x06
+   489 00000306 68[00000000]                push dword Keyboard_Buffer_Itself
+   490 0000030B E8(00000000)                call __Keyboard_Buffer_func
+   491 00000310 83C408                      add esp,8; 
+   492 00000313 EB5D                        jmp End_Keyboard
+   493                                  
+   494                                  K_7:   
+   495                                      
+   496 00000315 6A07                        push 0x07
+   497 00000317 68[00000000]                push dword Keyboard_Buffer_Itself
+   498 0000031C E8(00000000)                call __Keyboard_Buffer_func
+   499 00000321 83C408                      add esp,8; 
+   500 00000324 EB4C                        jmp End_Keyboard
+   501                                  
+   502                                  K_8:   
+   503                                      
+   504 00000326 6A08                        push 0x08
+   505 00000328 68[00000000]                push dword Keyboard_Buffer_Itself
+   506 0000032D E8(00000000)                call __Keyboard_Buffer_func
+   507 00000332 83C408                      add esp,8; 
+   508                                      
+   509 00000335 EB3B                        jmp End_Keyboard  
+   510                                  K_9:   
+   511                                  
+   512 00000337 6A09                        push 0x09
+   513 00000339 68[00000000]                push dword Keyboard_Buffer_Itself
+   514 0000033E E8(00000000)                call __Keyboard_Buffer_func
+   515 00000343 83C408                      add esp,8; 
+   516                                      
+   517 00000346 EB2A                        jmp End_Keyboard      
+   518                                  
+   519                                  
+   520                                  Buffer_full: 
+   521                                  ; If 17 key were pressed, reset the counter and load the data
+   522                                      ;mov dword eax, [Keyboard_counter]
+   523                                      ;mov eax, 0
+   524 00000348 C705[00000000]0000-         mov dword [Keyboard_counter], 0 ; Store the Keyboard_counter
+   524 00000350 0000               
+   525 00000352 EB0A                        jmp K_ENTER_2;
+   526                                  
+   527                                  
+   528                                  K_ENTER:   ; Process enter key
+   529 00000354 C705[00000000]0000-         mov dword [Keyboard_counter], 0 ; Reset the keyboard counter
+   529 0000035C 0000               
+   530                                  
+   531                                  K_ENTER_2:    
+   532                                      ;xchg bx, bx
+   533 0000035E 68[00000000]                push dword Keyboard_Buffer_Itself
+   534 00000363 68[00000000]                push dword Load_Keyboard_table_Itself
+   535 00000368 E8(00000000)                call Load_KeyBoardTable
+   536 0000036D 83C408                      add esp,8
+   537                                      ;xchg bx, bx
+   538                                  
+   539                                      ;push dword Keyboard_Buffer_Itself
+   540                                      ;call buffer_Clear
+   541                                      ;add esp, 4
+   542                                  
+   543 00000370 EB00                        jmp End_Keyboard
+   544                                  
+   545                                  End_Keyboard:
+   546 00000372 B020                        MOV al, 0x20 ;Send END of interrupt to PIC
+   547 00000374 E620                        OUT 0x20, al
+   548 00000376 61                          POPAD ;Pop all general purp registers to stack
+   549 00000377 CF                          iret     
+   550                                      
+   551                                  
+   552                                  IRQ01__TIMER0:
+   553                                                              
+   554 00000378 E9(00000000)                jmp Basic_Scheduler     ; Jump rather than calling for keep stack just the same
+   555                                                 
+   556                                      
+   557                                  Timer_fin:
+   558 0000037D B020                        MOV al, 0x20                        
+   559 0000037F E620                        OUT 0x20, al                              
+   560 00000381 CF                          iret                                
+   561                                  
+   562                                  
+   563                                  
+   564                                  
+   565                                  

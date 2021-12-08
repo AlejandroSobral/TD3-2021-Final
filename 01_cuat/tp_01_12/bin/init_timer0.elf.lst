@@ -1,0 +1,22 @@
+     1                                  Chnl0_Data_port         EQU 0x40
+     2                                  Mode_Command_register   EQU 0x43
+     3                                  EXTERN TIMER_COUNTER
+     4                                  
+     5                                  
+     6                                  section .init_timer0
+     7                                  
+     8                                  GLOBAL init_timer0
+     9                                  
+    10                                  init_timer0:
+    11                                  
+    12 00000000 B034                    mov al, 00110100b; Channel cero both parts
+    13 00000002 E643                    out Mode_Command_register, al; Data out
+    14 00000004 66B89C2E                mov ax, 11932; 10ms 1931181h Hz / 65536 ; lowest time I can get 54,94mS
+    15 00000008 E640                    out Chnl0_Data_port, al ; Low register nibble
+    16 0000000A 88E0                    mov al, ah
+    17 0000000C E640                    out Chnl0_Data_port, al; High register nibble
+    18 0000000E C705[00000000]0000-     mov dword [TIMER_COUNTER], 0x00
+    18 00000016 0000               
+    19                                  
+    20 00000018 C3                      ret
+    21                                  

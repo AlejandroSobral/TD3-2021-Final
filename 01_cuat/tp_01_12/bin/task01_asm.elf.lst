@@ -1,0 +1,70 @@
+     1                                  
+     2                                  ;; CHECK P. 101 de los PDF de paginacion
+     3                                  section .task01_functions
+     4                                  USE32
+     5                                  
+     6                                  GLOBAL task01
+     7                                  GLOBAL TASK1_LABEL
+     8                                  
+     9                                  ;Global Variables
+    10                                  EXTERN buffer_Clear
+    11                                  EXTERN Keyboard_Buffer_Itself
+    12                                  EXTERN Load_Keyboard_table_Itself
+    13                                  EXTERN _64bits_average_func
+    14                                  EXTERN Screen_Writing
+    15                                  EXTERN Screen_pointer
+    16                                  EXTERN Flag_Task_1;
+    17                                  EXTERN _access_average_memory
+    18                                  EXTERN __VIDEO_VMA
+    19                                  VIDEO_BUFFER_ADDR EQU 0x00E80000
+    20                                  
+    21                                  task01:
+    22                                  TASK1_LABEL:
+    23                                  
+    24                                  
+    25                                  ; wait_for_flag:
+    26                                  ;     mov eax, dword [Flag_Task_1]
+    27                                  ;     cmp eax, 0x01;
+    28                                  ;     je Average_on;
+    29                                  ;     jmp wait_for_flag; No task
+    30                                  ;     nop
+    31                                  
+    32                                  ; Average_on:
+    33                                  ;     mov eax, 0x00
+    34                                  ;     mov dword [Flag_Task_1], eax;Reset task flag
+    35                                  
+    36 00000000 B80000E800                  mov eax, VIDEO_BUFFER_ADDR
+    37 00000005 A3[00000000]                mov [Screen_pointer],eax;  Reload the screen pointer    
+    38                                  
+    39 0000000A 55                          push    ebp
+    40 0000000B 89E5                        mov     ebp, esp
+    41 0000000D 68[00000000]                push dword Digit_Table_Average
+    42 00000012 68[00000000]                push dword Load_Keyboard_table_Itself
+    43 00000017 E8(00000000)                call _64bits_average_func
+    44 0000001C C9                          leave
+    45                                  
+    46 0000001D 55                          push    ebp
+    47 0000001E 89E5                        mov     ebp, esp
+    48 00000020 6A40                        push 64 ;Column
+    49 00000022 6A00                        push 0  ;Row   
+    50 00000024 68[00000000]                push dword Digit_Table_Average     
+    51 00000029 68[00000000]                push dword __VIDEO_VMA ;Screen_pointer
+    52                                  
+    53 0000002E E8(00000000)                call Screen_Writing
+    54                                      ;xchg bx, bx
+    55                                  
+    56 00000033 C9                          leave    
+    57                                  
+    58                                  
+    59                                      ;Access to random position may cause a Page Fault (PF)
+    60                                      ;Not any more
+    61                                      ;mov dword eax,  [Digit_Table_Average]
+    62                                      ;mov dword ebx,  [eax]
+    63                                  
+    64 00000034 F4                          hlt
+    65 00000035 EBC9                        jmp TASK1_LABEL
+    66                                  
+    67                                  
+    68                                  section .data_01
+    69 00000000 <res 00000013>          Digit_Table_Average resb 19 ;    
+    69          ******************       warning: uninitialized space declared in non-BSS section `.data_01': zeroing

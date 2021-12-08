@@ -1,0 +1,43 @@
+     1                                  section .task03_functions
+     2                                  USE32
+     3                                  
+     4                                  GLOBAL TASK3_LABEL
+     5                                  
+     6                                  EXTERN sum_all_task3
+     7                                  EXTERN Screen_Writing
+     8                                  EXTERN Screen_pointer
+     9                                  EXTERN Load_Keyboard_table_Itself
+    10                                  EXTERN __VIDEO_VMA
+    11                                  DATA_TABLE_SIZE EQU 10
+    12                                  VIDEO_BUFFER_ADDR EQU 0x00E80000
+    13                                  
+    14                                  TASK3_LABEL:
+    15                                      ;; SIMD ADD ! .-.-.-.-.
+    16 00000000 31C9                        xor ecx, ecx
+    17 00000002 BE[00000000]                mov esi, Load_Keyboard_table_Itself          ;Data Source        
+    18 00000007 BF[00000000]                mov edi, Keyboard_Buffer_TotalSum_Task3      ;Total Sum                 
+    19 0000000C BB0A000000                  mov ebx, DATA_TABLE_SIZE
+    20 00000011 0FEFC0                      pxor mm0, mm0
+    21                                  
+    22                                  ADD_T3:
+    23 00000014 0FD406                      paddq qword mm0, [esi]
+    23          ******************       warning: register size specification ignored
+    24 00000017 83C608                      add esi, 8                          
+    25 0000001A 41                          inc ecx
+    26 0000001B 39D9                        cmp ecx, ebx
+    27 0000001D 75F5                        jne ADD_T3
+    28 0000001F 0F7F07                      movq qword [edi], mm0               
+    29                                      ;; END SIMD ADD .-.-.-.-.
+    30                                  
+    31 00000022 55                          push    ebp
+    32 00000023 89E5                        mov     ebp, esp
+    33 00000025 6A40                        push 64 ;Column
+    34 00000027 6A02                        push 2  ;Row   
+    35 00000029 68[00000000]                push dword Keyboard_Buffer_TotalSum_Task3     
+    36 0000002E 68[00000000]                push dword __VIDEO_VMA;:VIDEO_BUFFER_ADDR;[Screen_pointer]
+    37 00000033 E8(00000000)                call Screen_Writing
+    38 00000038 C9                          leave    
+    39 00000039 F4                          hlt
+    40                                  
+    41                                  section .data_03
+    42 00000000 0000000000000000        Keyboard_Buffer_TotalSum_Task3 dq 0  

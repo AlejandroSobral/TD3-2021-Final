@@ -1,0 +1,332 @@
+     1                                  
+     2                                  %include "inc/externs.h" 
+     1                              <1> EXTERN kernel32_init
+     2                              <1> EXTERN TASK1_LABEL
+     3                              <1> EXTERN TASK3_LABEL
+     4                              <1> EXTERN TASK2_LABEL
+     5                              <1> EXTERN __TSS_KERNEL 
+     6                              <1> EXTERN __PAGE_TABLES_PHY     
+     7                              <1> EXTERN __FUNCTIONS_PHY       
+     8                              <1> EXTERN __VIDEO_PHY           
+     9                              <1> EXTERN __ISR_AND_KEYBOARD_PHY
+    10                              <1> EXTERN __DATA_PHY            
+    11                              <1> EXTERN __TABLE_KEYBOARD_PHY  
+    12                              <1> EXTERN __KERNEL_32_PHY       
+    13                              <1> EXTERN __TASK_1_TEXT_PHY     
+    14                              <1> EXTERN __TASK_1_BSS_PHY      
+    15                              <1> EXTERN __TASK_1_DATA_PHY     
+    16                              <1> EXTERN __TASK_1_RODATA_PHY   
+    17                              <1> EXTERN __STACK_START_32_PHY  
+    18                              <1> EXTERN __STACK_END_32_PHY    
+    19                              <1> EXTERN __STACK_TASK1_PHY
+    20                              <1> EXTERN __TASK_1_STACK_END_PHY
+    21                              <1> EXTERN __SYS_TABLES_IDT
+    22                              <1> EXTERN __PAGE_TABLES_VMA
+    23                              <1> EXTERN __VIDEO_VMA
+    24                              <1> EXTERN __load_DTP_entry_rom
+    25                              <1> EXTERN __load_TP_entry_rom
+    26                              <1> EXTERN __DATA_VMA
+    27                              <1> EXTERN __INIT_16_VMA
+    28                              <1> EXTERN __INIT_32_VMA
+    29                              <1> EXTERN __STACK_START_32_VMA
+    30                              <1> EXTERN __FUNCTIONS_VMA
+    31                              <1> EXTERN __SYS_TABLES_VMA
+    32                              <1> EXTERN __DATA_VMA
+    33                              <1> EXTERN __ISR_AND_KEYBOARD_VMA
+    34                              <1> EXTERN __KERNEL_32_VMA
+    35                              <1> EXTERN __TASK_1_BSS_VMA
+    36                              <1> EXTERN __TASK_1_RODATA_VMA
+    37                              <1> EXTERN __TASK_1_TEXT_VMA
+    38                              <1> EXTERN __TASK_1_DATA_VMA
+    39                              <1> EXTERN __TABLE_KEYBOARD_VMA
+    40                              <1> EXTERN __TASK_1_RODATA_PHY
+    41                              <1> EXTERN __STACK_TASK1_VMA
+    42                              <1> EXTERN __STACK_START_32
+    43                              <1> EXTERN __CR3_KERNEL
+    44                              <1> EXTERN __CR3_TASK1
+    45                              <1> EXTERN __CR3_TASK2
+    46                              <1> EXTERN __CR3_TASK3
+    47                              <1> EXTERN __CR3_TASK4
+    48                              <1> EXTERN LOAD_CR3_ROM
+    49                              <1> EXTERN set_dtp_pt_merged_rom
+    50                              <1> EXTERN __SYS_TABLES_TSS_PHY
+    51                              <1> EXTERN __SYS_TABLES_PAG_PHY
+    52                              <1> EXTERN __SYS_TABLES_PAG_VMA
+    53                              <1> EXTERN __SYS_TABLES_LMA
+    54                              <1> EXTERN TURN_ON_PAGING
+    55                              <1> EXTERN __INIT_32_LMA
+    56                              <1> EXTERN __INIT_32_VMA
+    57                              <1> EXTERN SYS_TABLES_TSS_VMA
+    58                              <1> 
+    59                              <1> EXTERN __SYS_TABLES_PHY      
+    60                              <1> EXTERN __SYS_TABLES_TSS_PHY  
+    61                              <1> EXTERN __SYS_TABLES_PAG_PHY  
+    62                              <1> EXTERN __SYS_TABLES_PAG_T0_PH
+    63                              <1> EXTERN __SYS_TABLES_PAG_T1_PH
+    64                              <1> EXTERN __SYS_TABLES_PAG_T2_PH
+    65                              <1> EXTERN __SYS_TABLES_PAG_T3_PH
+    66                              <1> EXTERN __PAGE_TABLES_PHY     
+    67                              <1> EXTERN __VIDEO_PHY           
+    68                              <1> EXTERN __ISR_AND_KEYBOARD_PHY
+    69                              <1> EXTERN __DATA_PHY            
+    70                              <1> EXTERN __TABLE_KEYBOARD_PHY  
+    71                              <1> EXTERN __KERNEL_32_PHY       
+    72                              <1> EXTERN __FUNCTIONS_PHY       
+    73                              <1> EXTERN __TASK_1_TEXT_PHY     
+    74                              <1> EXTERN __TASK_1_BSS_PHY      
+    75                              <1> EXTERN __TASK_1_DATA_PHY     
+    76                              <1> EXTERN __TASK_1_RODATA_PHY   
+    77                              <1> EXTERN __TASK_2_TEXT_PHY     
+    78                              <1> EXTERN __TASK_2_BSS_PHY      
+    79                              <1> EXTERN __TASK_2_DATA_PHY     
+    80                              <1> EXTERN __TASK_2_RODATA_PHY   
+    81                              <1> EXTERN __TASK_3_TEXT_PHY     
+    82                              <1> EXTERN __TASK_3_BSS_PHY      
+    83                              <1> EXTERN __TASK_3_DATA_PHY     
+    84                              <1> EXTERN __TASK_3_RODATA_PHY   
+    85                              <1> EXTERN __TASK_4_TEXT_PHY     
+    86                              <1> EXTERN __TASK_4_BSS_PHY      
+    87                              <1> EXTERN __TASK_4_DATA_PHY     
+    88                              <1> EXTERN __TASK_4_RODATA_PHY   
+    89                              <1> EXTERN __STACK_START_32_PHY  
+    90                              <1> EXTERN __STACK_END_32_PHY    
+    91                              <1> EXTERN __TASK_1_STACK_START_PHY
+    92                              <1> EXTERN __TASK_1_STACK_PHY_END
+    93                              <1> 
+    94                              <1> EXTERN __STACK_KERNEL_PHY    
+    95                              <1> EXTERN __STACK_KERNEL_PHY_END   
+    96                              <1> EXTERN __STACK_TASK1_PHY     
+    97                              <1> EXTERN __STACK_TASK1_PHY_END 
+    98                              <1> EXTERN __STACK_TASK2_PHY     
+    99                              <1> EXTERN __STACK_TASK2_PHY_END 
+   100                              <1> EXTERN __STACK_TASK3_PHY     
+   101                              <1> EXTERN __STACK_TASK3_PHY_END 
+   102                              <1> EXTERN __STACK_TASK4_PHY     
+   103                              <1> EXTERN __STACK_TASK4_PHY_END 
+   104                              <1> EXTERN __SYS_TABLES_VMA      
+   105                              <1> EXTERN __SYS_TABLES_IDT      
+   106                              <1> EXTERN __SYS_TABLES_GDT      
+   107                              <1> EXTERN __PAGE_TABLES_VMA     
+   108                              <1> EXTERN __SYS_TABLES_TSS_VMA  
+   109                              <1> EXTERN __SYS_TABLES_PAG_VMA  
+   110                              <1> EXTERN __SYS_TABLES_PAG_T1_VM
+   111                              <1> EXTERN __SYS_TABLES_PAG_T2_VM
+   112                              <1> EXTERN __SYS_TABLES_PAG_T3_VM
+   113                              <1> EXTERN __SYS_TABLES_PAG_T4_VM
+   114                              <1> EXTERN __FUNCTIONS_VMA       
+   115                              <1> EXTERN __VIDEO_VMA           
+   116                              <1> EXTERN __ISR_AND_KEYBOARD_VMA
+   117                              <1> EXTERN __DATA_VMA            
+   118                              <1> EXTERN __TABLE_KEYBOARD_VMA  
+   119                              <1> EXTERN __KERNEL_32_VMA       
+   120                              <1> EXTERN __TASK_1_TEXT_VMA     
+   121                              <1> EXTERN __TASK_1_BSS_VMA      
+   122                              <1> EXTERN __TASK_1_DATA_VMA     
+   123                              <1> EXTERN __TASK_1_RODATA_VMA   
+   124                              <1> EXTERN __TASK_2_TEXT_VMA     
+   125                              <1> EXTERN __TASK_2_BSS_VMA      
+   126                              <1> EXTERN __TASK_2_DATA_VMA     
+   127                              <1> EXTERN __TASK_2_RODATA_VMA   
+   128                              <1> EXTERN __TASK_3_TEXT_VMA     
+   129                              <1> EXTERN __TASK_3_BSS_VMA      
+   130                              <1> EXTERN __TASK_3_DATA_VMA     
+   131                              <1> EXTERN __TASK_3_RODATA_VMA   
+   132                              <1> EXTERN __TASK_4_TEXT_VMA     
+   133                              <1> EXTERN __TASK_4_BSS_VMA      
+   134                              <1> EXTERN __TASK_4_DATA_VMA     
+   135                              <1> EXTERN __TASK_4_RODATA_VMA   
+   136                              <1> EXTERN __STACK_START_32      
+   137                              <1> EXTERN __STACK_END_32        
+   138                              <1> EXTERN __STACK_TASK1_VMA    
+   139                              <1> EXTERN __STACK_TASK1_VMA_END
+   140                              <1> EXTERN __STACK_TASK2_VMA    
+   141                              <1> EXTERN __STACK_TASK2_VMA_END  
+   142                              <1> EXTERN __STACK_TASK3_VMA    
+   143                              <1> EXTERN __STACK_TASK3_VMA_END
+   144                              <1> EXTERN __STACK_TASK4_VMA    
+   145                              <1> EXTERN __STACK_TASK4_VMA_END
+   146                              <1> EXTERN __INIT_16_VMA         
+   147                              <1> EXTERN __INIT_32_VMA         
+   148                              <1> EXTERN __FUNCTIONS_ROM_VMA   
+   149                              <1> EXTERN __RESET_VMA           
+     3                                  
+     4                                  section .load_tss
+     5                                  GLOBAL load_tss
+     6                                  EXTERN __TSS_TASK1
+     7                                  EXTERN __TSS_TASK2
+     8                                  EXTERN __TSS_TASK3
+     9                                  EXTERN __TSS_TASK4
+    10                                  EXTERN TASK1_LABEL
+    11                                  EXTERN TASK2_LABEL
+    12                                  EXTERN TASK3_LABEL
+    13                                  EXTERN TASK4_LABEL
+    14                                  EXTERN kernel32_loop
+    15                                  EXTERN DS_SEL
+    16                                  EXTERN DS_SEL_11
+    17                                  EXTERN CS_SEL_11
+    18                                  EXTERN CS_SEL_32
+    19                                  EXTERN DS_SEL
+    20                                  EXTERN TSS_SEL
+    21                                  EXTERN __STACK_KERNEL_T1_PHY
+    22                                  EXTERN __STACK_KERNEL_T1_VMA_END
+    23                                  EXTERN __STACK_KERNEL_T2_PHY
+    24                                  EXTERN __STACK_KERNEL_T2_VMA_END
+    25                                  EXTERN __STACK_KERNEL_T3_PHY
+    26                                  EXTERN __STACK_KERNEL_T3_VMA_END
+    27                                  EXTERN __STACK_KERNEL_T4_PHY
+    28                                  EXTERN __STACK_KERNEL_T4_VMA_END
+    29                                  EFLAGS EQU 0x202
+    30                                  ;https://wiki.osdev.org/Task_State_Segment
+    31                                  load_tss:
+    32                                  
+    33                                  ;------------TSS TASK1------------
+    34 00000000 B8[00000000]                mov eax, __TSS_TASK1
+    35 00000005 C70000000000                mov [eax], dword(0) ; Previous task link
+    36 0000000B C74004[00000000]            mov [eax+0x04], dword(__STACK_KERNEL_T1_VMA_END) ;ESP0
+    37 00000012 C74008[00000000]            mov [eax+0x08], dword(DS_SEL)   ;SS0                 
+    38 00000019 C7400C00000000              mov [eax+0x0C], dword(0) ;ESP1
+    39 00000020 C7401000000000              mov [eax+0x10], dword(0) ;SS1
+    40 00000027 C74014[00000000]            mov [eax+0x14], dword(__STACK_TASK1_VMA_END) ;ESP2
+    41 0000002E C74018[03000000]            mov [eax+0x18], dword(DS_SEL_11+3) ;SS2
+    42 00000035 C7401C[00000000]            mov [eax+0x1C], dword(__CR3_TASK1);CR3
+    43 0000003C C74020[00000000]            mov [eax+0x20], dword(TASK1_LABEL) ;EIP
+    44 00000043 C7402402020000              mov [eax+0x24], dword(EFLAGS) ;EFLAGS
+    45 0000004A C7402800000000              mov [eax+0x28], dword(0) ;EAX
+    46 00000051 C7402C00000000              mov [eax+0x2C], dword(0) ;ECX
+    47 00000058 C7403000000000              mov [eax+0x30], dword(0) ;EDX
+    48 0000005F C7403400000000              mov [eax+0x34], dword(0) ;EBX
+    49 00000066 C74038[00000000]            mov [eax+0x38], dword(__STACK_TASK1_VMA_END) ;ESP
+    50 0000006D C7403C[00000000]            mov [eax+0x3C], dword(__STACK_TASK1_VMA_END)    ;EBP
+    51 00000074 C7404000000000              mov [eax+0x40], dword(0) ;ESI
+    52 0000007B C7404400000000              mov [eax+0x44], dword(0) ;EDI
+    53 00000082 C74048[03000000]            mov [eax+0x48], dword(DS_SEL_11+3) ;ES
+    54 00000089 C7404C[03000000]            mov [eax+0x4C], dword(CS_SEL_11+3) ;CS
+    55 00000090 C74050[03000000]            mov [eax+0x50], dword(DS_SEL_11+3) ;SS
+    56 00000097 C74054[03000000]            mov [eax+0x54], dword(DS_SEL_11+3) ;DS
+    57 0000009E C74058[03000000]            mov [eax+0x58], dword(DS_SEL_11+3) ;FS
+    58 000000A5 C7405C[03000000]            mov [eax+0x5C], dword(DS_SEL_11+3);GS
+    59 000000AC C7406000000000              mov [eax+0x60], dword(0)   ;LDTR
+    60 000000B3 C7406400000000              mov [eax+0x64], dword(0) ;Bitmap I/O
+    61                                  
+    62                                  ;------------TSS TASK2------------
+    63 000000BA B8[00000000]               mov eax, __TSS_TASK2
+    64 000000BF C70000000000                mov [eax], dword(0) ;
+    65 000000C5 C74004[00000000]            mov [eax+0x04], dword(__STACK_KERNEL_T2_VMA_END) ;ESP0
+    66 000000CC C74008[00000000]            mov [eax+0x08], dword(DS_SEL)   ;SS0                 
+    67 000000D3 C7400C00000000              mov [eax+0x0C], dword(0) ;ESP1
+    68 000000DA C7401000000000              mov [eax+0x10], dword(0) ;SS1
+    69 000000E1 C74014[00000000]            mov [eax+0x14], dword(__STACK_TASK2_VMA_END) ;ESP2
+    70 000000E8 C74018[03000000]            mov [eax+0x18], dword(DS_SEL_11+3) ;SS2
+    71 000000EF C7401C[00000000]            mov [eax+0x1C], dword(__CR3_TASK2);CR3
+    72 000000F6 C74020[00000000]            mov [eax+0x20], dword(TASK2_LABEL) ;EIP
+    73 000000FD C7402402020000              mov [eax+0x24], dword(EFLAGS) ;EFLAGS
+    74 00000104 C7402800000000              mov [eax+0x28], dword(0) ;EAX
+    75 0000010B C7402C00000000              mov [eax+0x2C], dword(0) ;ECX
+    76 00000112 C7403000000000              mov [eax+0x30], dword(0) ;EDX
+    77 00000119 C7403400000000              mov [eax+0x34], dword(0) ;EBX
+    78 00000120 C74038[00000000]            mov [eax+0x38], dword(__STACK_TASK2_VMA_END) ;ESP
+    79 00000127 C7403C[00000000]            mov [eax+0x3C], dword(__STACK_TASK2_VMA_END)    ;EBP
+    80 0000012E C7404000000000              mov [eax+0x40], dword(0) ;ESI
+    81 00000135 C7404400000000              mov [eax+0x44], dword(0) ;EDI
+    82 0000013C C74048[03000000]            mov [eax+0x48], dword(DS_SEL_11+3) ;ES
+    83 00000143 C7404C[03000000]            mov [eax+0x4C], dword(CS_SEL_11+3) ;CS
+    84 0000014A C74050[03000000]            mov [eax+0x50], dword(DS_SEL_11+3) ;SS
+    85 00000151 C74054[03000000]            mov [eax+0x54], dword(DS_SEL_11+3) ;DS
+    86 00000158 C74058[03000000]            mov [eax+0x58], dword(DS_SEL_11+3) ;FS
+    87 0000015F C7405C[03000000]            mov [eax+0x5C], dword(DS_SEL_11+3);GS
+    88 00000166 C7406000000000              mov [eax+0x60], dword(0)   ;LDTR
+    89 0000016D C7406400000000              mov [eax+0x64], dword(0) ;Bitmap I/O
+    90                                  
+    91                                  ;------------TSS TASK3------------
+    92 00000174 B8[00000000]               mov eax, __TSS_TASK3
+    93 00000179 C70000000000                mov [eax], dword(0) ;
+    94 0000017F C74004[00000000]            mov [eax+0x04], dword(__STACK_KERNEL_T3_VMA_END) ;ESP0
+    95 00000186 C74008[00000000]            mov [eax+0x08], dword(DS_SEL)   ;SS0                 
+    96 0000018D C7400C00000000              mov [eax+0x0C], dword(0) ;ESP1
+    97 00000194 C7401000000000              mov [eax+0x10], dword(0) ;SS1
+    98 0000019B C74014[00000000]            mov [eax+0x14], dword(__STACK_TASK3_VMA_END) ;ESP2
+    99 000001A2 C74018[03000000]            mov [eax+0x18], dword(DS_SEL_11+3) ;SS2
+   100 000001A9 C7401C[00000000]            mov [eax+0x1C], dword(__CR3_TASK3);CR3
+   101 000001B0 C74020[00000000]            mov [eax+0x20], dword(TASK3_LABEL) ;EIP
+   102 000001B7 C7402402020000              mov [eax+0x24], dword(EFLAGS) ;EFLAGS
+   103 000001BE C7402800000000              mov [eax+0x28], dword(0) ;EAX
+   104 000001C5 C7402C00000000              mov [eax+0x2C], dword(0) ;ECX
+   105 000001CC C7403000000000              mov [eax+0x30], dword(0) ;EDX
+   106 000001D3 C7403400000000              mov [eax+0x34], dword(0) ;EBX
+   107 000001DA C74038[00000000]            mov [eax+0x38], dword(__STACK_TASK3_VMA_END) ;ESP
+   108 000001E1 C7403C[00000000]            mov [eax+0x3C], dword(__STACK_TASK3_VMA_END)    ;EBP
+   109 000001E8 C7404000000000              mov [eax+0x40], dword(0) ;ESI
+   110 000001EF C7404400000000              mov [eax+0x44], dword(0) ;EDI
+   111 000001F6 C74048[03000000]            mov [eax+0x48], dword(DS_SEL_11+3) ;ES
+   112 000001FD C7404C[03000000]            mov [eax+0x4C], dword(CS_SEL_11+3) ;CS
+   113 00000204 C74050[03000000]            mov [eax+0x50], dword(DS_SEL_11+3) ;SS
+   114 0000020B C74054[03000000]            mov [eax+0x54], dword(DS_SEL_11+3) ;DS
+   115 00000212 C74058[03000000]            mov [eax+0x58], dword(DS_SEL_11+3) ;FS
+   116 00000219 C7405C[03000000]            mov [eax+0x5C], dword(DS_SEL_11+3);GS
+   117 00000220 C7406000000000              mov [eax+0x60], dword(0)   ;LDTR
+   118 00000227 C7406400000000              mov [eax+0x64], dword(0) ;Bitmap I/O         
+   119                                  
+   120                                  ;------------TSS TASK4------------
+   121 0000022E B8[00000000]               mov eax, __TSS_TASK4
+   122 00000233 C70000000000                mov [eax], dword(0) ;
+   123 00000239 C74004[00000000]            mov [eax+0x04], dword(__STACK_KERNEL_T4_VMA_END) ;ESP0
+   124 00000240 C74008[00000000]            mov [eax+0x08], dword(DS_SEL)   ;SS0                 
+   125 00000247 C7400C00000000              mov [eax+0x0C], dword(0) ;ESP1
+   126 0000024E C7401000000000              mov [eax+0x10], dword(0) ;SS1
+   127 00000255 C74014[00000000]            mov [eax+0x14], dword(__STACK_TASK4_VMA_END) ;ESP2
+   128 0000025C C74018[00000000]            mov [eax+0x18], dword(DS_SEL) ;SS2
+   129 00000263 C7401C[00000000]            mov [eax+0x1C], dword(__CR3_TASK4);CR3
+   130 0000026A C74020[00000000]            mov [eax+0x20], dword(TASK4_LABEL) ;EIP
+   131 00000271 C7402402020000              mov [eax+0x24], dword(EFLAGS) ;EFLAGS
+   132 00000278 C7402800000000              mov [eax+0x28], dword(0) ;EAX
+   133 0000027F C7402C00000000              mov [eax+0x2C], dword(0) ;ECX
+   134 00000286 C7403000000000              mov [eax+0x30], dword(0) ;EDX
+   135 0000028D C7403400000000              mov [eax+0x34], dword(0) ;EBX
+   136 00000294 C74038[00000000]            mov [eax+0x38], dword(__STACK_TASK4_VMA_END) ;ESP
+   137 0000029B C7403C[00000000]            mov [eax+0x3C], dword(__STACK_TASK4_VMA_END) ;EBP
+   138 000002A2 C7404000000000              mov [eax+0x40], dword(0) ;ESI
+   139 000002A9 C7404400000000              mov [eax+0x44], dword(0) ;EDI
+   140 000002B0 C74048[00000000]            mov [eax+0x48], dword(DS_SEL) ;ES
+   141 000002B7 C7404C[00000000]            mov [eax+0x4C], dword(CS_SEL_32) ;CS
+   142 000002BE C74050[00000000]            mov [eax+0x50], dword(DS_SEL) ;SS
+   143 000002C5 C74054[00000000]            mov [eax+0x54], dword(DS_SEL) ;DS
+   144 000002CC C74058[00000000]            mov [eax+0x58], dword(DS_SEL) ;FS
+   145 000002D3 C7405C[00000000]            mov [eax+0x5C], dword(DS_SEL);GS
+   146 000002DA C7406000000000              mov [eax+0x60], dword(0)   ;LDTR
+   147 000002E1 C7406400000000              mov [eax+0x64], dword(0) ;Bitmap I/O
+   148                                  
+   149                                  ;------------TSS KERNEL------------
+   150 000002E8 B8[00000000]               mov eax, __TSS_KERNEL
+   151 000002ED C70000000000                mov [eax], dword(0) ;
+   152 000002F3 C74004[00000000]            mov [eax+0x04], dword(__STACK_END_32) ;ESP0
+   153 000002FA C74008[00000000]            mov [eax+0x08], dword(DS_SEL)   ;SS0                 
+   154 00000301 C7400C00000000              mov [eax+0x0C], dword(0) ;ESP1
+   155 00000308 C7401000000000              mov [eax+0x10], dword(0) ;SS1
+   156 0000030F C74014[00000000]            mov [eax+0x14], dword(__STACK_END_32) ;ESP2
+   157 00000316 C74018[00000000]            mov [eax+0x18], dword(DS_SEL_11) ;SS2
+   158 0000031D C7401C[00000000]            mov [eax+0x1C], dword(__CR3_KERNEL);CR3
+   159 00000324 C74020[00000000]            mov [eax+0x20], dword(kernel32_loop) ;EIP
+   160 0000032B C7402402020000              mov [eax+0x24], dword(EFLAGS) ;EFLAGS
+   161 00000332 C7402800000000              mov [eax+0x28], dword(0) ;EAX
+   162 00000339 C7402C00000000              mov [eax+0x2C], dword(0) ;ECX
+   163 00000340 C7403000000000              mov [eax+0x30], dword(0) ;EDX
+   164 00000347 C7403400000000              mov [eax+0x34], dword(0) ;EBX
+   165 0000034E C7403800000000              mov [eax+0x38], dword(0) ;ESP
+   166 00000355 C7403C00000000              mov [eax+0x3C], dword(0) ;EBP
+   167 0000035C C7404000000000              mov [eax+0x40], dword(0) ;ESI
+   168 00000363 C7404400000000              mov [eax+0x44], dword(0) ;EDI
+   169 0000036A C74048[00000000]            mov [eax+0x48], dword(DS_SEL) ;ES
+   170 00000371 C7404C[00000000]            mov [eax+0x4C], dword(CS_SEL_32) ;CS
+   171 00000378 C74050[00000000]            mov [eax+0x50], dword(DS_SEL) ;SS
+   172 0000037F C74054[00000000]            mov [eax+0x54], dword(DS_SEL) ;DS
+   173 00000386 C74058[00000000]            mov [eax+0x58], dword(DS_SEL) ;FS
+   174 0000038D C7405C[00000000]            mov [eax+0x5C], dword(DS_SEL);GS
+   175 00000394 C7406000000000              mov [eax+0x60], dword(0)   ;LDTR
+   176 0000039B C7406400000000              mov [eax+0x64], dword(0) ;Bitmap I/O
+   177 000003A2 31C0                        xor eax, eax
+   178 000003A4 66B8[0000]                  mov ax, TSS_SEL
+   179 000003A8 0F00D8                      ltr ax ; Load TSS
+   180                                  
+   181                                  
+   182                                  
+   183 000003AB C3                          ret

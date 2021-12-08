@@ -1,0 +1,37 @@
+     1                                  
+     2                                  ;; CHECK P. 101 de los PDF de paginacion
+     3                                  section .kernel32
+     4                                  USE32
+     5                                  GLOBAL kernel32_code_size
+     6                                  GLOBAL kernel32_init
+     7                                  GLOBAL kernel32_loop
+     8                                  
+     9                                  EXTERN __SYS_TABLES_IDT
+    10                                  EXTERN __SYS_TABLES_GDT
+    11                                  
+    12                                  ;Global Variables
+    13                                  EXTERN buffer_Clear
+    14                                  EXTERN KEYBOARD_BUFFER_ITSELF
+    15                                  EXTERN DIGIT_TABLE_KERNEL
+    16                                  EXTERN _64BITS_AVERAGE_FUNC
+    17                                  EXTERN SCREEN_WRITING
+    18                                  EXTERN SCREEN_POINTER
+    19                                  EXTERN DIGIT_TABLE_AVERAGE
+    20                                  VIDEO_BUFFER_ADDR EQU 0x000B8000
+    21                                  ;Function references
+    22                                  EXTERN init_timer0
+    23                                  EXTERN task01
+    24                                  
+    25                                  kernel32_code_size EQU (kernel32_end-kernel32_init)
+    26                                  
+    27                                  
+    28                                  
+    29                                  kernel32_init:
+    30                                  
+    31 00000000 FB                          sti; 
+    32                                  
+    33                                  kernel32_loop:
+    34 00000001 F4                          hlt
+    35 00000002 EBFD                        jmp kernel32_loop ; Waiting for interrupts endless cycle
+    36                                  
+    37                                  kernel32_end:

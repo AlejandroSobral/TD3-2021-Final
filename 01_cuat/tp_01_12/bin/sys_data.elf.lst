@@ -1,0 +1,58 @@
+     1                                  GLOBAL Keyboard_Buffer_Itself
+     2                                  GLOBAL Load_Keyboard_table_Itself
+     3                                  GLOBAL TIMER_COUNTER
+     4                                  GLOBAL Keyboard_counter
+     5                                  GLOBAL Digit_Table_Average
+     6                                  GLOBAL Screen_pointer
+     7                                  GLOBAL Flag_Task_1
+     8                                  GLOBAL PF_error_code
+     9                                  GLOBAL PF_lin_addrs
+    10                                  GLOBAL SCH_ACTUAL_TASK
+    11                                  GLOBAL SCH_NEXT_TASK
+    12                                  GLOBAL STATUS_T1
+    13                                  GLOBAL STATUS_T2
+    14                                  GLOBAL STATUS_T3
+    15                                  GLOBAL STATUS_T4
+    16                                  GLOBAL TSS_TO_LOAD 
+    17                                  GLOBAL CR3_TO_LOAD
+    18                                  GLOBAL NEW_STACK
+    19                                  GLOBAL TASK1_COUNTER 
+    20                                  GLOBAL TASK2_COUNTER 
+    21                                  GLOBAL TASK3_COUNTER 
+    22                                  GLOBAL TASK4_COUNTER
+    23                                  GLOBAL First_time_Flag
+    24                                  
+    25                                  
+    26                                  ;Mem Section
+    27                                  SECTION .TABLE_KEYBOARD
+    28 00000000 <res 000000BE>          Load_Keyboard_table_Itself resb 190 ;
+    28          ******************       warning: uninitialized space declared in non-BSS section `.TABLE_KEYBOARD': zeroing
+    29 000000BE <res 00000013>          Keyboard_Buffer_Itself resb 19   ;
+    29          ******************       warning: uninitialized space declared in non-BSS section `.TABLE_KEYBOARD': zeroing
+    30 000000D1 00                      Keyboard_counter db 0x00; Count how many keys were pressed
+    31                                  
+    32                                   
+    33                                  SECTION .__DATA__
+    34 00000000 0000                    TIMER_COUNTER dw 0x00
+    35 00000002 0000                    TASK1_COUNTER dw 0x00
+    36 00000004 0000                    TASK2_COUNTER dw 0x00
+    37 00000006 0000                    TASK3_COUNTER dw 0x00
+    38 00000008 0000                    TASK4_COUNTER dw 0x00
+    39 0000000A 00                      SCH_ACTUAL_TASK db 0
+    40 0000000B 00                      SCH_NEXT_TASK db 0
+    41 0000000C <res 00000004>          Screen_pointer resb 4; 
+    41          ******************       warning: uninitialized space declared in non-BSS section `.__DATA__': zeroing
+    42 00000010 00                      Flag_Task_1 db 0x00
+    43 00000011 <res 00000004>          PF_error_code resd 1
+    43          ******************       warning: uninitialized space declared in non-BSS section `.__DATA__': zeroing
+    44 00000015 <res 00000004>          PF_lin_addrs resd 1
+    44          ******************       warning: uninitialized space declared in non-BSS section `.__DATA__': zeroing
+    45 00000019 00                      First_time_Flag db 0
+    46 0000001A 00                      STATUS_T1 db 0
+    47 0000001B 00                      STATUS_T2 db 0
+    48 0000001C 00                      STATUS_T3 db 0
+    49 0000001D 00                      STATUS_T4 db 0
+    50 0000001E 00000000                TSS_TO_LOAD dd 0
+    51 00000022 00000000                CR3_TO_LOAD dd 0
+    52 00000026 <res 000000C0>          NEW_STACK resd 48
+    52          ******************       warning: uninitialized space declared in non-BSS section `.__DATA__': zeroing

@@ -1,0 +1,293 @@
+     1                                  EXTERN  IDT_handler_loader_rom
+     2                                  EXTERN CS_SEL_32
+     3                                  EXTERN __SYS_TABLES_IDT
+     4                                  
+     5                                  
+     6                                  ; Exceptions & Interrupt labeling;
+     7                                  EXTERN EXCEPTION_DE     ;0
+     8                                  EXTERN EXCEPTION_DB     ;1
+     9                                  EXTERN EXCEPTION_NMI    ;2
+    10                                  EXTERN EXCEPTION_BE     ;3
+    11                                  EXTERN EXCEPTION_OF     ;4
+    12                                  EXTERN EXCEPTION_BR     ;5
+    13                                  EXTERN EXCEPTION_UD     ;6
+    14                                  EXTERN EXCEPTION_NM     ;7
+    15                                  EXTERN EXCEPTION_DF     ;8
+    16                                  EXTERN EXCEPTION_CoS    ;9
+    17                                  EXTERN EXCEPTION_TS     ;10
+    18                                  EXTERN EXCEPTION_NP     ;11
+    19                                  EXTERN EXCEPTION_SS     ;12
+    20                                  EXTERN EXCEPTION_GP     ;13
+    21                                  EXTERN EXCEPTION_PF     ;14
+    22                                  EXTERN EXCEPTION_MF     ;16
+    23                                  EXTERN EXCEPTION_AC     ;17
+    24                                  EXTERN EXCEPTION_MC     ;18
+    25                                  EXTERN EXCEPTION_XM     ;19
+    26                                  EXTERN SYS_CALL_L       ;80 
+    27                                  EXTERN IRQ00__Key_Handler;
+    28                                  EXTERN IRQ01__TIMER0;
+    29                                  
+    30                                  ;IDT Attributes
+    31                                  ATTR_EXC EQU 0x0000008F
+    32                                  ATTR_INT EQU 0x0000008E
+    33                                  ATTR_SYS EQU 0x000000EE
+    34                                  
+    35                                  section .init_IDT
+    36                                  
+    37                                  GLOBAL init_IDT
+    38                                  init_IDT:
+    39                                  
+    40                                  
+    41                                  ; Divide Error Exception #DE 
+    42 00000000 55                          push ebp
+    43 00000001 89E5                        mov ebp, esp    
+    44 00000003 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+    45 00000008 688F000000                  push dword(ATTR_EXC)            ; Attributes
+    46 0000000D 68[00000000]                push dword(EXCEPTION_DE)        ;Function offset - address at lma
+    47 00000012 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+    48 00000017 6A00                        push dword(0x00)                ; Excp. Number
+    49 00000019 E8(00000000)                call IDT_handler_loader_rom
+    50 0000001E C9                          leave
+    51                                  
+    52                                  
+    53                                   ; Debug #DB
+    54 0000001F 55                          push ebp
+    55 00000020 89E5                        mov ebp, esp    
+    56 00000022 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+    57 00000027 688F000000                  push dword(ATTR_EXC)            ; Attributes
+    58 0000002C 68[00000000]                push dword(EXCEPTION_DB)        ;Function offset - address at lma
+    59 00000031 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+    60 00000036 6A01                        push dword(0x01)                ; Excp. Number
+    61 00000038 E8(00000000)                call IDT_handler_loader_rom
+    62 0000003D C9                          leave
+    63                                  
+    64                                   ;  #NMI 
+    65 0000003E 55                          push ebp
+    66 0000003F 89E5                        mov ebp, esp    
+    67 00000041 68[00000000]                push dword(__SYS_TABLES_IDT)     ; IDT Addres
+    68 00000046 688F000000                  push dword(ATTR_EXC)            ; Attributes
+    69 0000004B 68[00000000]                push dword(EXCEPTION_NMI)        ;Function offset - address at lma
+    70 00000050 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+    71 00000055 6A02                        push dword(0x02)                ; Excp. Number
+    72 00000057 E8(00000000)                call IDT_handler_loader_rom
+    73 0000005C C9                          leave
+    74                                  
+    75                                   ; #BE
+    76 0000005D 55                          push ebp
+    77 0000005E 89E5                        mov ebp, esp    
+    78 00000060 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+    79 00000065 688F000000                  push dword(ATTR_EXC)            ; Attributes
+    80 0000006A 68[00000000]                push dword(EXCEPTION_BE)        ;Function offset - address at lma
+    81 0000006F 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+    82 00000074 6A03                        push dword(0x03)                ; Excp. Number
+    83 00000076 E8(00000000)                call IDT_handler_loader_rom
+    84 0000007B C9                          leave
+    85                                   
+    86                                   ; #OF 
+    87 0000007C 55                          push ebp
+    88 0000007D 89E5                        mov ebp, esp    
+    89 0000007F 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+    90 00000084 688F000000                  push dword(ATTR_EXC)            ; Attributes
+    91 00000089 68[00000000]                push dword(EXCEPTION_OF)        ;Function offset - address at lma
+    92 0000008E 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+    93 00000093 6A04                        push dword(0x04)                ; Excp. Number
+    94 00000095 E8(00000000)                call IDT_handler_loader_rom
+    95 0000009A C9                          leave
+    96                                  
+    97                                  ;  #BR 
+    98 0000009B 55                          push ebp
+    99 0000009C 89E5                        mov ebp, esp    
+   100                                  
+   101 0000009E 68[00000000]                push dword(__SYS_TABLES_IDT)     ; IDT Addres
+   102 000000A3 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   103 000000A8 68[00000000]                push dword(EXCEPTION_BR)        ;Function offset - address at lma
+   104 000000AD 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   105 000000B2 6A05                        push dword(0x05)                ; Excp. Number
+   106 000000B4 E8(00000000)                call IDT_handler_loader_rom
+   107 000000B9 C9                          leave
+   108                                  
+   109                                   ; #UD
+   110 000000BA 55                          push ebp
+   111 000000BB 89E5                        mov ebp, esp    
+   112 000000BD 68[00000000]                push dword(__SYS_TABLES_IDT)     ; IDT Addres
+   113 000000C2 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   114 000000C7 68[00000000]                push dword(EXCEPTION_UD)        ;Function offset - address at lma
+   115 000000CC 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   116 000000D1 6A06                        push dword(0x06)                ; Excp. Number
+   117 000000D3 E8(00000000)                call IDT_handler_loader_rom
+   118 000000D8 C9                          leave
+   119                                  
+   120                                   ;  #NM
+   121 000000D9 55                          push ebp
+   122 000000DA 89E5                        mov ebp, esp    
+   123 000000DC 68[00000000]                push dword(__SYS_TABLES_IDT)     ; IDT Addres
+   124 000000E1 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   125 000000E6 68[00000000]                push dword(EXCEPTION_NM)        ;Function offset - address at lma
+   126 000000EB 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   127 000000F0 6A07                        push dword(0x07)                ; Excp. Number
+   128 000000F2 E8(00000000)                call IDT_handler_loader_rom
+   129 000000F7 C9                          leave
+   130                                  
+   131                                    ; #DF 
+   132 000000F8 55                          push ebp
+   133 000000F9 89E5                        mov ebp, esp    
+   134 000000FB 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   135 00000100 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   136 00000105 68[00000000]                push dword(EXCEPTION_DF)        ;Function offset - address at lma
+   137 0000010A 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   138 0000010F 6A08                        push dword(0x08)                ; Excp. Number
+   139 00000111 E8(00000000)                call IDT_handler_loader_rom
+   140 00000116 C9                          leave
+   141                                  
+   142                                   ; #DB
+   143 00000117 55                          push ebp
+   144 00000118 89E5                        mov ebp, esp    
+   145 0000011A 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   146 0000011F 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   147 00000124 68[00000000]                push dword(EXCEPTION_CoS)        ;Function offset - address at lma
+   148 00000129 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   149 0000012E 6A09                        push dword(0x09)                ; Excp. Number
+   150 00000130 E8(00000000)                call IDT_handler_loader_rom
+   151 00000135 C9                          leave
+   152                                  
+   153                                   ; #TS
+   154 00000136 55                          push ebp
+   155 00000137 89E5                        mov ebp, esp    
+   156 00000139 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   157 0000013E 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   158 00000143 68[00000000]                push dword(EXCEPTION_TS)        ;Function offset - address at lma
+   159 00000148 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   160 0000014D 6A0A                        push dword(0x0A)                ; Excp. Number
+   161 0000014F E8(00000000)                call IDT_handler_loader_rom
+   162 00000154 C9                          leave
+   163                                  
+   164                                   ; #NP
+   165 00000155 55                          push ebp
+   166 00000156 89E5                        mov ebp, esp    
+   167 00000158 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   168 0000015D 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   169 00000162 68[00000000]                push dword(EXCEPTION_NP)        ;Function offset - address at lma
+   170 00000167 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   171 0000016C 6A0B                        push dword(0x0B)                ; Excp. Number
+   172 0000016E E8(00000000)                call IDT_handler_loader_rom
+   173 00000173 C9                          leave
+   174                                   
+   175                                   ; #SS
+   176 00000174 55                          push ebp
+   177 00000175 89E5                        mov ebp, esp    
+   178 00000177 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   179 0000017C 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   180 00000181 68[00000000]                push dword(EXCEPTION_SS)        ;Function offset - address at lma
+   181 00000186 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   182 0000018B 6A0C                        push dword(0x0C)                ; Excp. Number
+   183 0000018D E8(00000000)                call IDT_handler_loader_rom
+   184 00000192 C9                          leave
+   185                                  
+   186                                   ; #GP
+   187 00000193 55                          push ebp
+   188 00000194 89E5                        mov ebp, esp    
+   189 00000196 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   190 0000019B 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   191 000001A0 68[00000000]                push dword(EXCEPTION_GP)        ;Function offset - address at lma
+   192 000001A5 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   193 000001AA 6A0D                        push dword(0x0D)                ; Excp. Number
+   194 000001AC E8(00000000)                call IDT_handler_loader_rom
+   195 000001B1 C9                          leave
+   196                                  
+   197                                  ;  #PF
+   198 000001B2 55                          push ebp
+   199 000001B3 89E5                        mov ebp, esp    
+   200 000001B5 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   201 000001BA 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   202 000001BF 68[00000000]                push dword(EXCEPTION_PF)        ;Function offset - address at lma
+   203 000001C4 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   204 000001C9 6A0E                        push dword(0x0E)                ; Excp. Number
+   205 000001CB E8(00000000)                call IDT_handler_loader_rom
+   206 000001D0 C9                          leave
+   207                                  
+   208                                   ; #MF
+   209 000001D1 55                          push ebp
+   210 000001D2 89E5                        mov ebp, esp    
+   211 000001D4 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   212 000001D9 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   213 000001DE 68[00000000]                push dword(EXCEPTION_MF)        ;Function offset - address at lma
+   214 000001E3 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   215 000001E8 6A10                        push dword(0x10)                ; Excp. Number
+   216 000001EA E8(00000000)                call IDT_handler_loader_rom
+   217 000001EF C9                          leave
+   218                                  
+   219                                  ; #AC
+   220 000001F0 55                          push ebp
+   221 000001F1 89E5                        mov ebp, esp    
+   222 000001F3 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   223 000001F8 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   224 000001FD 68[00000000]                push dword(EXCEPTION_AC)        ;Function offset - address at lma
+   225 00000202 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   226 00000207 6A11                        push dword(0x11)                ; Excp. Number
+   227 00000209 E8(00000000)                call IDT_handler_loader_rom
+   228 0000020E C9                          leave
+   229                                  
+   230                                  ; #MC
+   231 0000020F 55                          push ebp
+   232 00000210 89E5                        mov ebp, esp    
+   233 00000212 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   234 00000217 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   235 0000021C 68[00000000]                push dword(EXCEPTION_MC)        ;Function offset - address at lma
+   236 00000221 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   237 00000226 6A12                        push dword(0x12)                ; Excp. Number
+   238 00000228 E8(00000000)                call IDT_handler_loader_rom
+   239 0000022D C9                          leave
+   240                                  
+   241                                   ; #XM
+   242 0000022E 55                          push ebp
+   243 0000022F 89E5                        mov ebp, esp    
+   244 00000231 68[00000000]                push dword(__SYS_TABLES_IDT)    ; IDT Addres
+   245 00000236 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   246 0000023B 68[00000000]                push dword(EXCEPTION_XM)        ;Function offset - address at lma
+   247 00000240 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   248 00000245 6A13                        push dword(0x13)                ; Excp. Number
+   249 00000247 E8(00000000)                call IDT_handler_loader_rom
+   250 0000024C C9                          leave
+   251                                  
+   252                                       ;Load IDT w/  Keyboard handler 
+   253 0000024D 55                          push ebp
+   254 0000024E 89E5                        mov ebp, esp    
+   255 00000250 68[00000000]                push dword(__SYS_TABLES_IDT)     ; IDT Addres
+   256 00000255 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   257 0000025A 68[00000000]                push dword(IRQ00__Key_Handler)  ;Function offset - address at lma
+   258 0000025F 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   259 00000264 6A21                        push dword(0x21)                ; Excp. Number
+   260 00000266 E8(00000000)                call IDT_handler_loader_rom
+   261 0000026B C9                          leave
+   262                                  
+   263                                  
+   264                                     ;Load IDT w/ Timer0 Handler 
+   265                                  
+   266 0000026C 55                          push ebp
+   267 0000026D 89E5                        mov ebp, esp    
+   268 0000026F 68[00000000]                push dword(__SYS_TABLES_IDT)               ; IDT Addres
+   269 00000274 688F000000                  push dword(ATTR_EXC)            ; Attributes
+   270 00000279 68[00000000]                push dword(IRQ01__TIMER0)  ;Function offset - address at lma
+   271 0000027E 68[00000000]                push dword(CS_SEL_32)           ; Section w/ it belong
+   272 00000283 6A20                        push dword(0x20)                ; Excp. Number
+   273 00000285 E8(00000000)                call IDT_handler_loader_rom
+   274 0000028A C9                          leave
+   275                                  
+   276                                    
+   277                                  
+   278                                     ;Syscall_Handler 
+   279 0000028B 55                         push ebp
+   280 0000028C 89E5                       mov ebp, esp    
+   281 0000028E 68[00000000]               push dword(__SYS_TABLES_IDT)               ; IDT Addres
+   282 00000293 68EE000000                 push dword(ATTR_SYS)
+   283 00000298 68[00000000]               push dword(SYS_CALL_L)                    ;Function offset - address at lma       
+   284 0000029D 68[00000000]               push (CS_SEL_32)                          ;Selector
+   285 000002A2 6880000000                 push dword(0x80)                          ; Excp. Number
+   286 000002A7 E8(00000000)               call IDT_handler_loader_rom
+   287 000002AC C9                         leave
+   288                                  
+   289                                  
+   290                                      
+   291 000002AD C3                      ret
+   292                                  
+   293                                  

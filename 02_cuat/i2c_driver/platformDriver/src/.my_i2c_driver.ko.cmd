@@ -1,0 +1,1 @@
+cmd_/home/debian/VSCEntry/i2c_driver/platformDriver/src/my_i2c_driver.ko := ld -r  -EL -T ./scripts/module-common.lds -T ./arch/arm/kernel/module.lds  --build-id  -o /home/debian/VSCEntry/i2c_driver/platformDriver/src/my_i2c_driver.ko /home/debian/VSCEntry/i2c_driver/platformDriver/src/my_i2c_driver.o /home/debian/VSCEntry/i2c_driver/platformDriver/src/my_i2c_driver.mod.o ;  true

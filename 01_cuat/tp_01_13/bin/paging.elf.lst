@@ -1,0 +1,989 @@
+     1                                  %include "inc/processor-flags.h" 
+     1                              <1> %define X86_CR0_PE      0x00000001 ;/* Protectede mode enable*/
+     2                              <1> %define X86_CR0_MP      0x00000002 ;/* Monitor coProcessor*/
+     3                              <1> %define X86_CR0_EM      0x00000004 ;/* Emulation*/
+     4                              <1> %define X86_CR0_TS      0x00000008 ;/* Task Switched*/
+     5                              <1> %define X86_CR0_ET      0x00000010 ;/* Extension Type*/
+     6                              <1> %define X86_CR0_NE      0x00000020 ;/* Numeric Error*/
+     7                              <1> %define X86_CR0_WP      0x00010000 ;/* Write Protect*/
+     8                              <1> %define X86_CR0_AM      0x00040000 ;/* Alignment Mask*/
+     9                              <1> %define X86_CR0_NW      0x20000000 ;/* Not Write-through*/
+    10                              <1> %define X86_CR0_CD      0x40000000 ;/* Cache Disable*/
+    11                              <1> %define X86_CR0_PG      0x80000000 ;/* PaGine*/
+    12                              <1> 
+     2                                  %include "inc/defines.h" 
+     1                              <1> 
+     2                              <1> %define PORT_A_8042    0x60
+     3                              <1> %define CTRL_PORT_8042 0x64
+     4                              <1> %define KEYB_DIS       0xAD
+     5                              <1> %define KEYB_EN        0xAE
+     6                              <1> %define READ_OUT_8042  0xD0
+     7                              <1> %define WRITE_OUT_8042 0xD1
+     8                              <1> 
+     9                              <1> 
+    10                              <1> %define _KEY_1     0x02
+    11                              <1> %define _KEY_2     0x03
+    12                              <1> %define _KEY_3     0x04
+    13                              <1> %define _KEY_4     0x05
+    14                              <1> %define _KEY_5     0x06
+    15                              <1> %define _KEY_6     0x07
+    16                              <1> %define _KEY_7     0x08
+    17                              <1> %define _KEY_8     0x09
+    18                              <1> %define _KEY_9     0x0A
+    19                              <1> %define _KEY_0     0x0B
+    20                              <1> 
+    21                              <1> %define _KEY_ENTER 0x1C
+    22                              <1> 
+    23                              <1> %define _KEY_A     0x1E
+    24                              <1> %define _KEY_B     0x30
+    25                              <1> %define _KEY_C     0x2E
+    26                              <1> %define _KEY_D     0x20
+    27                              <1> %define _KEY_E     0x12
+    28                              <1> %define _KEY_F     0x21
+    29                              <1> %define _KEY_G     0x22
+    30                              <1> %define _KEY_H     0x23
+    31                              <1> %define _KEY_I     0x17
+    32                              <1> %define _KEY_J     0x24
+    33                              <1> %define _KEY_K     0x25
+    34                              <1> %define _KEY_L     0x26
+    35                              <1> %define _KEY_M     0x32
+    36                              <1> %define _KEY_N     0x31
+    37                              <1> %define _KEY_O     0x18
+    38                              <1> %define _KEY_P     0x19
+    39                              <1> %define _KEY_Q     0x10
+    40                              <1> %define _KEY_R     0x13
+    41                              <1> %define _KEY_S     0x1F
+    42                              <1> %define _KEY_T     0x14
+    43                              <1> %define _KEY_U     0x16
+    44                              <1> %define _KEY_V     0x2F
+    45                              <1> %define _KEY_W     0x11
+    46                              <1> %define _KEY_X     0x2D
+    47                              <1> %define _KEY_Y     0x15
+    48                              <1> %define _KEY_Z     0x2C
+    49                              <1> 
+    50                              <1> SYS_CALL_HALT     EQU     0
+    51                              <1> SYS_CALL_READ     EQU     1
+    52                              <1> SYS_CALL_WRITE    EQU     2
+    53                              <1> SYS_CALL_SCREEN   EQU     3
+    54                              <1> 
+    55                              <1>  
+     3                                  section .go_paging
+     4                                  
+     5                                  GLOBAL go_paging    
+     6                                  EXTERN __SYS_TABLES_PHY      
+     7                                  EXTERN __PAGE_TABLES_PHY     
+     8                                  EXTERN __FUNCTIONS_PHY       
+     9                                  EXTERN __VIDEO_PHY           
+    10                                  EXTERN __ISR_AND_KEYBOARD_PHY
+    11                                  EXTERN __DATA_PHY            
+    12                                  EXTERN __TABLE_KEYBOARD_PHY  
+    13                                  EXTERN __KERNEL_32_PHY       
+    14                                  EXTERN __TASK_1_TEXT_PHY     
+    15                                  EXTERN __TASK_1_BSS_PHY      
+    16                                  EXTERN __TASK_1_DATA_PHY     
+    17                                  EXTERN __TASK_1_RODATA_PHY   
+    18                                  EXTERN __STACK_START_32_PHY  
+    19                                  EXTERN __STACK_END_32_PHY    
+    20                                  EXTERN __STACK_TASK1_PHY
+    21                                  EXTERN __STACK_TASK1_VMA
+    22                                  EXTERN __STACK_TASK2_VMA
+    23                                  EXTERN __STACK_TASK3_VMA
+    24                                  EXTERN __TASK_1_STACK_END_PHY
+    25                                  EXTERN __SYS_TABLES_IDT
+    26                                  EXTERN __PAGE_TABLES_VMA
+    27                                  EXTERN __VIDEO_VMA
+    28                                  EXTERN __load_DTP_entry_rom
+    29                                  EXTERN __load_TP_entry_rom
+    30                                  EXTERN __DATA_VMA
+    31                                  EXTERN __INIT_16_VMA
+    32                                  EXTERN __INIT_32_VMA
+    33                                  EXTERN __STACK_START_32_VMA
+    34                                  EXTERN __FUNCTIONS_VMA
+    35                                  EXTERN __SYS_TABLES_VMA
+    36                                  EXTERN __DATA_VMA
+    37                                  EXTERN __ISR_AND_KEYBOARD_VMA
+    38                                  EXTERN __KERNEL_32_VMA
+    39                                  EXTERN __TASK_1_BSS_VMA
+    40                                  EXTERN __TASK_1_RODATA_VMA
+    41                                  EXTERN __TASK_1_TEXT_VMA
+    42                                  EXTERN __TASK_1_DATA_VMA
+    43                                  EXTERN __TABLE_KEYBOARD_VMA
+    44                                  EXTERN __TASK_1_RODATA_PHY
+    45                                  EXTERN __STACK_TASK1_VMA
+    46                                  EXTERN __STACK_START_32
+    47                                  EXTERN __CR3_KERNEL
+    48                                  EXTERN __CR3_TASK1
+    49                                  EXTERN __CR3_TASK2
+    50                                  EXTERN __CR3_TASK3
+    51                                  EXTERN __CR3_TASK4
+    52                                  EXTERN LOAD_CR3_ROM
+    53                                  EXTERN set_dtp_pt_merged_rom
+    54                                  EXTERN __SYS_TABLES_TSS_PHY
+    55                                  EXTERN __SYS_TABLES_PAG_PHY
+    56                                  EXTERN __SYS_TABLES_PAG_VMA
+    57                                  EXTERN __SYS_TABLES_LMA
+    58                                  EXTERN TURN_ON_PAGING
+    59                                  EXTERN __INIT_32_LMA
+    60                                  EXTERN __TASK_3_RODATA_PHY
+    61                                  EXTERN __TASK_3_RODATA_VMA
+    62                                  EXTERN __TASK_2_TEXT_PHY
+    63                                  EXTERN __TASK_2_TEXT_VMA
+    64                                  EXTERN __TASK_3_TEXT_PHY
+    65                                  EXTERN __TASK_3_TEXT_VMA
+    66                                  EXTERN __SYS_TABLES_TSS_VMA
+    67                                  EXTERN __STACK_START_32_PHY
+    68                                  EXTERN __STACK_START_32
+    69                                  EXTERN __STACK_TASK1_PHY
+    70                                  EXTERN __STACK_TASK1_VMA
+    71                                  EXTERN __SYS_TABLES_TSS_VMA
+    72                                  EXTERN __STACK_KERNEL_T1_PHY
+    73                                  EXTERN __STACK_KERNEL_T1_VMA
+    74                                  EXTERN __TASK_1_TEXT_PHY
+    75                                  EXTERN __TASK_2_TEXT_PHY
+    76                                  EXTERN __TASK_3_TEXT_PHY
+    77                                  EXTERN __TASK_4_TEXT_PHY
+    78                                  EXTERN __TASK_1_TEXT_VMA
+    79                                  EXTERN __TASK_2_TEXT_VMA
+    80                                  EXTERN __TASK_3_TEXT_VMA
+    81                                  EXTERN __TASK_4_TEXT_VMA
+    82                                  EXTERN __TEXT_TASK2_PHY
+    83                                  EXTERN __TEXT_TASK3_PHY
+    84                                  EXTERN __TEXT_TASK4_PHY
+    85                                  EXTERN __TEXT_TASK1_VMA
+    86                                  EXTERN __TEXT_TASK2_VMA
+    87                                  EXTERN __TEXT_TASK3_VMA
+    88                                  EXTERN __TEXT_TASK4_VMA
+    89                                  EXTERN __TASK_1_RODATA_PHY
+    90                                  EXTERN __TASK_1_RODATA_VMA
+    91                                  EXTERN __TASK_2_RODATA_PHY
+    92                                  EXTERN __TASK_2_RODATA_VMA
+    93                                  EXTERN __TASK_3_RODATA_PHY
+    94                                  EXTERN __TASK_3_RODATA_VMA
+    95                                  EXTERN __TASK_4_RODATA_PHY
+    96                                  EXTERN __TASK_4_RODATA_VMA
+    97                                  EXTERN __SYS_TABLES_PAG_T1_PHY
+    98                                  EXTERN __SYS_TABLES_PAG_T2_PHY
+    99                                  EXTERN __SYS_TABLES_PAG_T3_PHY
+   100                                  EXTERN __SYS_TABLES_PAG_T4_PHY
+   101                                  EXTERN __SYS_TABLES_PAG_T1_VMA
+   102                                  EXTERN __SYS_TABLES_PAG_T2_VMA
+   103                                  EXTERN __SYS_TABLES_PAG_T3_VMA
+   104                                  EXTERN __SYS_TABLES_PAG_T4_VMA
+   105                                  EXTERN __SYS_TABLES_PAG_T4_PHY
+   106                                  EXTERN __TASK_2_BSS_PHY
+   107                                  EXTERN __TASK_2_BSS_VMA
+   108                                  EXTERN __TASK_3_BSS_PHY
+   109                                  EXTERN __TASK_3_BSS_VMA
+   110                                  EXTERN __TASK_4_BSS_VMA
+   111                                  EXTERN __TASK_4_BSS_PHY
+   112                                  EXTERN __STACK_TASK2_PHY
+   113                                  EXTERN __STACK_TASK2_VMA
+   114                                  EXTERN __STACK_TASK3_PHY
+   115                                  EXTERN __STACK_TASK3_VMA
+   116                                  EXTERN __STACK_TASK4_VMA
+   117                                  EXTERN __STACK_TASK4_PHY
+   118                                  EXTERN __TASK_2_DATA_PHY
+   119                                  EXTERN __TASK_2_DATA_VMA
+   120                                  EXTERN __TASK_3_DATA_PHY
+   121                                  EXTERN __TASK_3_DATA_VMA
+   122                                  EXTERN __TASK_4_DATA_VMA
+   123                                  EXTERN __TASK_4_DATA_PHY
+   124                                  EXTERN __STACK_TASK1_PHY
+   125                                  EXTERN __STACK_TASK1_VMA
+   126                                  EXTERN __FUNCTIONS_ROM_LMA
+   127                                  EXTERN __STACK_KERNEL_T1_VMA
+   128                                  EXTERN __STACK_KERNEL_T1_VMA
+   129                                  EXTERN __STACK_KERNEL_T2_VMA
+   130                                  EXTERN __STACK_KERNEL_T2_PHY
+   131                                  EXTERN __STACK_KERNEL_T3_VMA
+   132                                  EXTERN __STACK_KERNEL_T3_PHY
+   133                                  EXTERN __STACK_KERNEL_T4_VMA
+   134                                  EXTERN __STACK_KERNEL_T4_PHY
+   135                                  EXTERN DS_SEL_11
+   136                                  EXTERN CS_SEL_11
+   137                                  EXTERN __TSS_TASK1
+   138                                  EXTERN __TSS_TASK2
+   139                                  EXTERN __TSS_TASK3
+   140                                  EXTERN __TSS_TASK4
+   141                                  
+   142                                  
+   143                                  
+   144                                  
+   145                                  PAG_PCD_YES equ 1       ; Cached                         
+   146                                  PAG_PCD_NO  equ 0       ; No-cached
+   147                                  PAG_PWT_YES equ 1       ; 1 to be write on Cache & Ram   
+   148                                  PAG_PWT_NO  equ 0       ; 0 
+   149                                  PAG_P_YES   equ 1       ; 1 Present
+   150                                  PAG_P_NO    equ 0       ; 0 No presente
+   151                                  PAG_RW_W    equ 1       ; 1 Read_Write
+   152                                  PAG_RW_R    equ 0       ; 0 Read only
+   153                                  PAG_US_SUP  equ 0       ; 0 Supervisor
+   154                                  PAG_US_US   equ 1       ; 1 User  
+   155                                  PAG_D       equ 0       ; Modify at page
+   156                                  PAG_PAT     equ 0       ; PAT                   
+   157                                  PAG_G_YES   equ 0       ; Global                 
+   158                                  PAG_A       equ 0       ; Accesed
+   159                                  PAG_PS_4K   equ 0       ; 4KB as PageSize
+   160                                  _4k         EQU 0x400   ; 1024 or 0x400
+   161                                  
+   162                                  SUP_R_P EQU 0x01
+   163                                  SUP_W_P EQU 0x03
+   164                                  US_R_P  EQU 0x05
+   165                                  US_W_P  EQU 0x07
+   166                                  _1024 EQU 0x400
+   167                                  
+   168                                  go_paging:
+   169                                  
+   170                                  
+   171                                  ;;;;;;;;;;;;;;;START - Paging;;;;;;;;;;;;;;;;;;;;;       
+   172 00000000 FA                          cli
+   173                                  
+   174                                      ;; Clean all CR3 DTP & 1st page - 1024 + 1024
+   175 00000001 BF[00000000]                mov edi,__CR3_KERNEL  
+   176 00000006 B900280000                   mov ecx,_1024 *10      
+   177 0000000B 31C0                        xor eax,eax           
+   178 0000000D F3AB                        rep stosd   
+   179                                  
+   180 0000000F BF[00000000]                mov edi,__CR3_TASK1   
+   181 00000014 B900080000                  mov ecx,_1024 *2      
+   182 00000019 31C0                        xor eax,eax           
+   183 0000001B F3AB                        rep stosd   
+   184                                      
+   185 0000001D BF[00000000]                mov edi,__CR3_TASK2   
+   186 00000022 B900080000                  mov ecx,_1024 *2      
+   187 00000027 31C0                        xor eax,eax           
+   188 00000029 F3AB                        rep stosd   
+   189                                  
+   190 0000002B BF[00000000]                mov edi,__CR3_TASK3   
+   191 00000030 B900080000                  mov ecx,_1024 *2      
+   192 00000035 31C0                        xor eax,eax           
+   193 00000037 F3AB                        rep stosd
+   194                                  
+   195                                      ; Set CR3 at DPT base add
+   196 00000039 55                          push    ebp
+   197 0000003A 89E5                        mov     ebp, esp
+   198 0000003C 6A01                        push    PAG_PWT_YES
+   199 0000003E 6A01                        push    PAG_PCD_YES
+   200 00000040 68[00000000]                push    dword __PAGE_TABLES_VMA
+   201 00000045 E8(00000000)                call    LOAD_CR3_ROM
+   202 0000004A 0F22D8                      mov     cr3, eax
+   203 0000004D C9                          leave    
+   204                                  
+   205                                      ;; After setting CR3x, go paging PT's.
+   206 0000004E 55                          push    ebp
+   207 0000004F 89E5                        mov     ebp, esp
+   208 00000051 6A01                        push SUP_R_P;Ok
+   209 00000053 68[00000000]                push dword(__ISR_AND_KEYBOARD_PHY)
+   210 00000058 68[00000000]                push dword(__ISR_AND_KEYBOARD_VMA)
+   211 0000005D 68[00000000]                push dword(__CR3_KERNEL)  
+   212 00000062 E8(00000000)                call set_dtp_pt_merged_rom
+   213 00000067 C9                          leave
+   214                                      ;;
+   215 00000068 55                          push    ebp
+   216 00000069 89E5                        mov     ebp, esp
+   217 0000006B 6A01                        push SUP_R_P;Ok     
+   218 0000006D 68[00000000]                push dword(__KERNEL_32_PHY)
+   219 00000072 68[00000000]                push dword(__KERNEL_32_VMA)
+   220 00000077 68[00000000]                push dword(__CR3_KERNEL)  
+   221 0000007C E8(00000000)                call set_dtp_pt_merged_rom
+   222 00000081 C9                          leave
+   223                                      ;;
+   224 00000082 55                          push    ebp
+   225 00000083 89E5                        mov     ebp, esp
+   226 00000085 6A01                        push SUP_R_P;Ok    
+   227 00000087 68[00000000]                push dword(__FUNCTIONS_PHY)
+   228 0000008C 68[00000000]                push dword(__FUNCTIONS_VMA)
+   229 00000091 68[00000000]                push dword(__CR3_KERNEL)  
+   230 00000096 E8(00000000)                call set_dtp_pt_merged_rom
+   231 0000009B C9                          leave
+   232                                      ;;
+   233 0000009C 55                          push    ebp
+   234 0000009D 89E5                        mov     ebp, esp
+   235 0000009F 6A01                        push SUP_R_P;Ok     
+   236 000000A1 68[00000000]                push dword(__SYS_TABLES_PHY)
+   237 000000A6 68[00000000]                push dword(__SYS_TABLES_VMA)
+   238 000000AB 68[00000000]                push dword(__CR3_KERNEL) 
+   239 000000B0 E8(00000000)                call set_dtp_pt_merged_rom
+   240 000000B5 C9                          leave
+   241                                      ;;    
+   242 000000B6 55                          push    ebp
+   243 000000B7 89E5                        mov     ebp, esp
+   244 000000B9 6A03                        push SUP_W_P;OK     
+   245 000000BB 68[00000000]                push dword(__SYS_TABLES_TSS_PHY)
+   246 000000C0 68[00000000]                push dword(__SYS_TABLES_TSS_VMA)
+   247 000000C5 68[00000000]                push dword(__CR3_KERNEL) 
+   248 000000CA E8(00000000)                call set_dtp_pt_merged_rom
+   249 000000CF C9                          leave 
+   250                                      ;;
+   251 000000D0 55                          push    ebp
+   252 000000D1 89E5                        mov     ebp, esp
+   253 000000D3 6A03                        push SUP_W_P;Ok     
+   254 000000D5 68[00000000]                push dword(__SYS_TABLES_PAG_PHY)
+   255 000000DA 68[00000000]                push dword(__SYS_TABLES_PAG_VMA)
+   256 000000DF 68[00000000]                push dword(__CR3_KERNEL)  
+   257 000000E4 E8(00000000)                call set_dtp_pt_merged_rom
+   258 000000E9 C9                          leave 
+   259                                      ;;    
+   260 000000EA 55                          push    ebp
+   261 000000EB 89E5                        mov     ebp, esp
+   262 000000ED 6A03                        push SUP_W_P;Ok     
+   263 000000EF 68[00000000]                push dword(__VIDEO_PHY)
+   264 000000F4 68[00000000]                push dword(__VIDEO_VMA)
+   265 000000F9 68[00000000]                push dword(__CR3_KERNEL)  
+   266 000000FE E8(00000000)                call set_dtp_pt_merged_rom
+   267 00000103 C9                          leave
+   268                                      ;;   
+   269 00000104 55                          push    ebp
+   270 00000105 89E5                        mov     ebp, esp
+   271 00000107 6A03                        push SUP_W_P;Ok     
+   272 00000109 68[00000000]                push dword(__DATA_PHY)
+   273 0000010E 68[00000000]                push dword(__DATA_VMA)
+   274 00000113 68[00000000]                push dword(__CR3_KERNEL)  
+   275 00000118 E8(00000000)                call set_dtp_pt_merged_rom
+   276 0000011D C9                          leave 
+   277                                      ;;
+   278 0000011E 55                          push    ebp
+   279 0000011F 89E5                        mov     ebp, esp
+   280 00000121 6A03                        push SUP_W_P;Ok     
+   281 00000123 68[00000000]                push dword(__STACK_START_32_PHY)
+   282 00000128 68[00000000]                push dword(__STACK_START_32)
+   283 0000012D 68[00000000]                push dword(__CR3_KERNEL)  
+   284 00000132 E8(00000000)                call set_dtp_pt_merged_rom
+   285 00000137 C9                          leave
+   286                                      ;;
+   287                                      ;;
+   288 00000138 55                          push    ebp
+   289 00000139 89E5                        mov     ebp, esp
+   290 0000013B 6A07                        push US_W_P     
+   291 0000013D 68[00000000]                push dword(__STACK_TASK1_PHY)
+   292 00000142 68[00000000]                push dword(__STACK_TASK1_VMA)
+   293 00000147 68[00000000]                push dword(__CR3_KERNEL)  
+   294 0000014C E8(00000000)                call set_dtp_pt_merged_rom
+   295 00000151 C9                          leave
+   296                                      ;;
+   297 00000152 55                          push    ebp
+   298 00000153 89E5                        mov     ebp, esp
+   299 00000155 6A07                        push US_W_P     
+   300 00000157 68[00000000]                push dword(__TABLE_KEYBOARD_PHY)
+   301 0000015C 68[00000000]                push dword(__TABLE_KEYBOARD_VMA)
+   302 00000161 68[00000000]                push dword(__CR3_KERNEL)  
+   303 00000166 E8(00000000)                call set_dtp_pt_merged_rom
+   304 0000016B C9                          leave
+   305                                      ;;
+   306 0000016C 55                          push    ebp
+   307 0000016D 89E5                        mov     ebp, esp
+   308 0000016F 6A03                        push SUP_W_P
+   309 00000171 68[00000000]                push dword(__FUNCTIONS_ROM_LMA) ; Rom init
+   310 00000176 68[00000000]                push dword(__FUNCTIONS_ROM_LMA)
+   311 0000017B 68[00000000]                push dword(__CR3_KERNEL)          
+   312 00000180 E8(00000000)                call set_dtp_pt_merged_rom
+   313 00000185 C9                          leave
+   314                                      ;;
+   315 00000186 55                          push    ebp
+   316 00000187 89E5                        mov     ebp, esp
+   317 00000189 6A03                        push SUP_W_P
+   318 0000018B 68[00000000]                push dword(__TSS_TASK1) 
+   319 00000190 68[00000000]                push dword(__TSS_TASK1)
+   320 00000195 68[00000000]                push dword(__CR3_KERNEL)          
+   321 0000019A E8(00000000)                call set_dtp_pt_merged_rom
+   322 0000019F C9                          leave
+   323                                      ;;
+   324 000001A0 55                          push    ebp
+   325 000001A1 89E5                        mov     ebp, esp
+   326 000001A3 6A03                        push SUP_W_P
+   327 000001A5 68[00000000]                push dword(__TSS_TASK2) 
+   328 000001AA 68[00000000]                push dword(__TSS_TASK2)
+   329 000001AF 68[00000000]                push dword(__CR3_KERNEL)          
+   330 000001B4 E8(00000000)                call set_dtp_pt_merged_rom
+   331 000001B9 C9                          leave
+   332                                      ;;
+   333 000001BA 55                          push    ebp
+   334 000001BB 89E5                        mov     ebp, esp
+   335 000001BD 6A03                        push SUP_W_P
+   336 000001BF 68[00000000]                push dword(__TSS_TASK3) 
+   337 000001C4 68[00000000]                push dword(__TSS_TASK3)
+   338 000001C9 68[00000000]                push dword(__CR3_KERNEL)          
+   339 000001CE E8(00000000)                call set_dtp_pt_merged_rom
+   340 000001D3 C9                          leave
+   341                                      ;;
+   342 000001D4 55                          push    ebp
+   343 000001D5 89E5                        mov     ebp, esp
+   344 000001D7 6A03                        push SUP_W_P
+   345 000001D9 68[00000000]                push dword(__TSS_TASK4) 
+   346 000001DE 68[00000000]                push dword(__TSS_TASK4)
+   347 000001E3 68[00000000]                push dword(__CR3_KERNEL)          
+   348 000001E8 E8(00000000)                call set_dtp_pt_merged_rom
+   349 000001ED C9                          leave             
+   350                                      ;;
+   351 000001EE 55                          push    ebp
+   352 000001EF 89E5                        mov     ebp, esp
+   353 000001F1 6A03                        push SUP_W_P
+   354 000001F3 68[00000000]                push dword(__INIT_32_VMA) ; Rom init
+   355 000001F8 68[00000000]                push dword(__INIT_32_VMA)
+   356 000001FD 68[00000000]                push dword(__CR3_KERNEL)          
+   357 00000202 E8(00000000)                call set_dtp_pt_merged_rom
+   358 00000207 C9                          leave
+   359                                      ;;
+   360 00000208 55                          push    ebp
+   361 00000209 89E5                        mov     ebp, esp
+   362 0000020B 6A03                        push SUP_W_P
+   363 0000020D 68[00100000]                push dword(__INIT_32_VMA+0x1000) ; Rom init
+   364 00000212 68[00100000]                push dword(__INIT_32_VMA+0x1000)
+   365 00000217 68[00000000]                push dword(__CR3_KERNEL)          
+   366 0000021C E8(00000000)                call set_dtp_pt_merged_rom
+   367 00000221 C9                          leave
+   368                                     
+   369                                      ;------------------TASK 1-----------------
+   370 00000222 55                          push    ebp
+   371 00000223 89E5                        mov     ebp, esp                                            
+   372 00000225 6A01                        push SUP_R_P
+   373 00000227 68[00000000]                push dword(__ISR_AND_KEYBOARD_PHY)
+   374 0000022C 68[00000000]                push dword(__ISR_AND_KEYBOARD_VMA)
+   375 00000231 68[00000000]                push dword(__CR3_TASK1)         
+   376 00000236 E8(00000000)                call set_dtp_pt_merged_rom
+   377 0000023B C9                          leave                       
+   378                                      ;;
+   379 0000023C 55                          push    ebp
+   380 0000023D 89E5                        mov     ebp, esp                                     
+   381 0000023F 6A01                        push SUP_R_P;US_R_P;
+   382 00000241 68[00000000]                push dword(__FUNCTIONS_PHY)
+   383 00000246 68[00000000]                push dword(__FUNCTIONS_VMA)
+   384 0000024B 68[00000000]                push dword(__CR3_TASK1)         
+   385 00000250 E8(00000000)                call set_dtp_pt_merged_rom
+   386 00000255 C9                          leave                  
+   387                                      ;;
+   388 00000256 55                          push    ebp
+   389 00000257 89E5                        mov     ebp, esp                    
+   390 00000259 6A03                        push SUP_W_P;Ok                        
+   391 0000025B 68[00000000]                push dword(__SYS_TABLES_TSS_PHY)            
+   392 00000260 68[00000000]                push dword(__SYS_TABLES_TSS_VMA)            
+   393 00000265 68[00000000]                push dword(__CR3_TASK1)                       
+   394 0000026A E8(00000000)                call set_dtp_pt_merged_rom
+   395 0000026F C9                          leave
+   396                                      ;;
+   397 00000270 55                          push    ebp
+   398 00000271 89E5                        mov     ebp, esp 
+   399 00000273 6A03                        push SUP_W_P;Ok                                            
+   400 00000275 68[00000000]                push dword(__TSS_TASK1)               
+   401 0000027A 68[00000000]                push dword(__TSS_TASK1)              
+   402 0000027F 68[00000000]                push dword(__CR3_TASK1)                       
+   403 00000284 E8(00000000)                call set_dtp_pt_merged_rom
+   404 00000289 C9                          leave    
+   405                                      ;;
+   406 0000028A 55                          push    ebp
+   407 0000028B 89E5                        mov     ebp, esp                                          
+   408 0000028D 6A03                        push SUP_W_P;
+   409 0000028F 68[00000000]                push dword(__VIDEO_PHY)
+   410 00000294 68[00000000]                push dword(__VIDEO_VMA)
+   411 00000299 68[00000000]                push dword(__CR3_TASK1)               
+   412 0000029E E8(00000000)                call set_dtp_pt_merged_rom
+   413 000002A3 C9                          leave
+   414                                      ;;
+   415 000002A4 55                          push    ebp
+   416 000002A5 89E5                        mov     ebp, esp                                          
+   417 000002A7 6A03                        push SUP_W_P
+   418 000002A9 68[00000000]                push dword(__DATA_PHY)
+   419 000002AE 68[00000000]                push dword(__DATA_VMA)
+   420 000002B3 68[00000000]                push dword(__CR3_TASK1)                           
+   421 000002B8 E8(00000000)                call set_dtp_pt_merged_rom
+   422 000002BD C9                          leave
+   423                                      ;;
+   424 000002BE 55                          push    ebp
+   425 000002BF 89E5                        mov     ebp, esp
+   426 000002C1 6A03                        push SUP_W_P;Ok     
+   427 000002C3 68[00000000]                push dword(__STACK_KERNEL_T1_PHY)
+   428 000002C8 68[00000000]                push dword(__STACK_KERNEL_T1_VMA)
+   429 000002CD 68[00000000]                push dword(__CR3_TASK1)  
+   430 000002D2 E8(00000000)                call set_dtp_pt_merged_rom
+   431 000002D7 C9                          leave       
+   432                                      ;;
+   433                                      ; push    ebp
+   434                                      ; mov     ebp, esp
+   435                                      ; push SUP_W_P
+   436                                      ; push dword(__STACK_START_32_PHY)
+   437                                      ; push dword(__STACK_START_32)
+   438                                      ; push dword(__CR3_TASK1)           
+   439                                      ; call set_dtp_pt_merged_rom
+   440                                      ; leave
+   441                                      ;;
+   442 000002D8 55                          push    ebp
+   443 000002D9 89E5                        mov     ebp, esp
+   444 000002DB 6A05                        push US_R_P;Ok
+   445 000002DD 68[00000000]                push dword(__TASK_1_TEXT_PHY)
+   446 000002E2 68[00000000]                push dword(__TASK_1_TEXT_VMA)
+   447 000002E7 68[00000000]                push dword(__CR3_TASK1)           
+   448 000002EC E8(00000000)                call set_dtp_pt_merged_rom
+   449 000002F1 C9                          leave
+   450                                      ;;
+   451 000002F2 55                          push    ebp
+   452 000002F3 89E5                        mov     ebp, esp
+   453 000002F5 6A05                        push US_R_P;SUP_R_P;
+   454 000002F7 68[00000000]                push dword(__TASK_1_RODATA_PHY)
+   455 000002FC 68[00000000]                push dword(__TASK_1_RODATA_VMA)
+   456 00000301 68[00000000]                push dword(__CR3_TASK1)           
+   457 00000306 E8(00000000)                call set_dtp_pt_merged_rom
+   458 0000030B C9                          leave
+   459                                      ;;
+   460 0000030C 55                          push    ebp
+   461 0000030D 89E5                        mov     ebp, esp
+   462 0000030F 6A07                        push US_W_P ;Ok                                           
+   463 00000311 68[00000000]                push dword(__SYS_TABLES_PHY)
+   464 00000316 68[00000000]                push dword(__SYS_TABLES_VMA)                         
+   465 0000031B 68[00000000]                push dword(__CR3_TASK1)                   
+   466 00000320 E8(00000000)                call set_dtp_pt_merged_rom
+   467 00000325 C9                          leave
+   468                                      ;;   
+   469 00000326 55                          push    ebp
+   470 00000327 89E5                        mov     ebp, esp
+   471 00000329 6A07                        push US_W_P;Ok
+   472 0000032B 68[00000000]                push dword(__SYS_TABLES_PAG_T1_PHY)
+   473 00000330 68[00000000]                push dword(__SYS_TABLES_PAG_T1_VMA)
+   474 00000335 68[00000000]                push dword(__CR3_TASK1)         
+   475 0000033A E8(00000000)                call set_dtp_pt_merged_rom
+   476 0000033F C9                          leave
+   477                                      ;;
+   478 00000340 55                          push    ebp
+   479 00000341 89E5                        mov     ebp, esp                               
+   480 00000343 6A07                        push US_W_P;Ok
+   481 00000345 68[00000000]                push dword(__TABLE_KEYBOARD_PHY)
+   482 0000034A 68[00000000]                push dword(__TABLE_KEYBOARD_VMA)
+   483 0000034F 68[00000000]                push dword(__CR3_TASK1)                    
+   484 00000354 E8(00000000)                call set_dtp_pt_merged_rom
+   485 00000359 C9                          leave
+   486                                      ;;
+   487 0000035A 55                          push    ebp
+   488 0000035B 89E5                        mov     ebp, esp
+   489 0000035D 6A07                        push US_W_P;Ok
+   490 0000035F 68[00000000]                push dword(__TASK_1_BSS_PHY)
+   491 00000364 68[00000000]                push dword(__TASK_1_BSS_VMA)
+   492 00000369 68[00000000]                push dword(__CR3_TASK1)           
+   493 0000036E E8(00000000)                call set_dtp_pt_merged_rom
+   494 00000373 C9                          leave
+   495                                      ;;
+   496 00000374 55                          push    ebp
+   497 00000375 89E5                        mov     ebp, esp
+   498 00000377 6A07                        push US_W_P
+   499 00000379 68[00000000]                push dword(__TASK_1_DATA_PHY)
+   500 0000037E 68[00000000]                push dword(__TASK_1_DATA_VMA)
+   501 00000383 68[00000000]                push dword(__CR3_TASK1)           
+   502 00000388 E8(00000000)                call set_dtp_pt_merged_rom
+   503 0000038D C9                          leave
+   504                                      ;;
+   505 0000038E 55                          push    ebp
+   506 0000038F 89E5                        mov     ebp, esp
+   507 00000391 6A07                        push US_W_P;Ok
+   508 00000393 68[00000000]                push dword(__STACK_TASK1_PHY)
+   509 00000398 68[00000000]                push dword(__STACK_TASK1_VMA)
+   510 0000039D 68[00000000]                push dword(__CR3_TASK1)           
+   511 000003A2 E8(00000000)                call set_dtp_pt_merged_rom
+   512 000003A7 C9                          leave
+   513                                  
+   514                                  
+   515                                  ;------------------TASK 2-----------------
+   516                                  
+   517 000003A8 55                          push    ebp
+   518 000003A9 89E5                        mov     ebp, esp
+   519 000003AB 6A01                        push SUP_R_P                        
+   520 000003AD 68[00000000]                push dword(__SYS_TABLES_PHY)                 
+   521 000003B2 68[00000000]                push dword(__SYS_TABLES_VMA)              
+   522 000003B7 68[00000000]                push dword(__CR3_TASK2)                   
+   523 000003BC E8(00000000)                call set_dtp_pt_merged_rom
+   524 000003C1 C9                          leave
+   525                                      ;;
+   526 000003C2 55                          push    ebp
+   527 000003C3 89E5                        mov     ebp, esp                                           
+   528 000003C5 6A01                        push SUP_R_P
+   529 000003C7 68[00000000]                push dword(__ISR_AND_KEYBOARD_PHY)
+   530 000003CC 68[00000000]                push dword(__ISR_AND_KEYBOARD_VMA)
+   531 000003D1 68[00000000]                push dword(__CR3_TASK2)         
+   532 000003D6 E8(00000000)                call set_dtp_pt_merged_rom 
+   533 000003DB C9                          leave                     
+   534                                      ;;
+   535 000003DC 55                          push    ebp
+   536 000003DD 89E5                        mov     ebp, esp                                      
+   537 000003DF 6A01                        push SUP_R_P;US_R_P;
+   538 000003E1 68[00000000]                push dword(__FUNCTIONS_PHY)
+   539 000003E6 68[00000000]                push dword(__FUNCTIONS_VMA)
+   540 000003EB 68[00000000]                push dword(__CR3_TASK2)         
+   541 000003F0 E8(00000000)                call set_dtp_pt_merged_rom
+   542 000003F5 C9                          leave                  
+   543                                      ;;
+   544 000003F6 55                          push    ebp
+   545 000003F7 89E5                        mov     ebp, esp
+   546 000003F9 6A03                        push SUP_W_P;Ok                                                   
+   547 000003FB 68[00000000]                push dword(__SYS_TABLES_TSS_PHY)               
+   548 00000400 68[00000000]                push dword(__SYS_TABLES_TSS_VMA)               
+   549 00000405 68[00000000]                push dword(__CR3_TASK2)                       
+   550 0000040A E8(00000000)                call set_dtp_pt_merged_rom
+   551 0000040F C9                          leave
+   552                                      ;;
+   553 00000410 55                          push    ebp
+   554 00000411 89E5                        mov     ebp, esp 
+   555 00000413 6A03                        push SUP_W_P;Ok                                            
+   556 00000415 68[00000000]                push dword(__TSS_TASK2)               
+   557 0000041A 68[00000000]                push dword(__TSS_TASK2)              
+   558 0000041F 68[00000000]                push dword(__CR3_TASK2)                       
+   559 00000424 E8(00000000)                call set_dtp_pt_merged_rom
+   560 00000429 C9                          leave    
+   561                                      ;;
+   562 0000042A 55                          push    ebp
+   563 0000042B 89E5                        mov     ebp, esp
+   564 0000042D 6A03                        push SUP_W_P
+   565 0000042F 68[00000000]                push dword(__SYS_TABLES_PAG_T2_PHY)
+   566 00000434 68[00000000]                push dword(__SYS_TABLES_PAG_T2_VMA)
+   567 00000439 68[00000000]                push dword(__CR3_TASK2)         
+   568 0000043E E8(00000000)                call set_dtp_pt_merged_rom
+   569 00000443 C9                          leave
+   570                                      ;;    
+   571 00000444 55                          push    ebp
+   572 00000445 89E5                        mov     ebp, esp                                
+   573 00000447 6A03                        push SUP_W_P;US_W_P;
+   574 00000449 68[00000000]                push dword(__VIDEO_PHY)
+   575 0000044E 68[00000000]                push dword(__VIDEO_VMA)
+   576 00000453 68[00000000]                push dword(__CR3_TASK2)               
+   577 00000458 E8(00000000)                call set_dtp_pt_merged_rom
+   578 0000045D C9                          leave
+   579                                      ;;
+   580 0000045E 55                          push    ebp
+   581 0000045F 89E5                        mov     ebp, esp                                          
+   582 00000461 6A03                        push SUP_W_P
+   583 00000463 68[00000000]                push dword(__DATA_PHY)
+   584 00000468 68[00000000]                push dword(__DATA_VMA)
+   585 0000046D 68[00000000]                push dword(__CR3_TASK2)                           
+   586 00000472 E8(00000000)                call set_dtp_pt_merged_rom
+   587 00000477 C9                          leave
+   588                                      ;;
+   589 00000478 55                          push    ebp
+   590 00000479 89E5                        mov     ebp, esp
+   591 0000047B 6A03                        push SUP_W_P     
+   592 0000047D 68[00000000]                push dword(__STACK_KERNEL_T2_PHY)
+   593 00000482 68[00000000]                push dword(__STACK_KERNEL_T2_VMA)
+   594 00000487 68[00000000]                push dword(__CR3_TASK2)  
+   595 0000048C E8(00000000)                call set_dtp_pt_merged_rom
+   596 00000491 C9                          leave  
+   597                                      ;;
+   598                                      ; push    ebp
+   599                                      ; mov     ebp, esp
+   600                                      ; push SUP_W_P
+   601                                      ; push dword(__STACK_START_32_PHY)
+   602                                      ; push dword(__STACK_START_32)
+   603                                      ; push dword(__CR3_TASK2)           
+   604                                      ; call set_dtp_pt_merged_rom
+   605                                      ; leave
+   606                                      ;;
+   607 00000492 55                          push    ebp
+   608 00000493 89E5                        mov     ebp, esp
+   609 00000495 6A05                        push US_R_P;SUP_R_P;
+   610 00000497 68[00000000]                push dword(__TASK_2_TEXT_PHY)
+   611 0000049C 68[00000000]                push dword(__TASK_2_TEXT_VMA)
+   612 000004A1 68[00000000]                push dword(__CR3_TASK2)           
+   613 000004A6 E8(00000000)                call set_dtp_pt_merged_rom
+   614 000004AB C9                          leave
+   615                                      ;;
+   616 000004AC 55                          push    ebp
+   617 000004AD 89E5                        mov     ebp, esp
+   618 000004AF 6A05                        push US_R_P
+   619 000004B1 68[00000000]                push dword(__TASK_2_RODATA_PHY)
+   620 000004B6 68[00000000]                push dword(__TASK_2_RODATA_VMA)
+   621 000004BB 68[00000000]                push dword(__CR3_TASK2)           
+   622 000004C0 E8(00000000)                call set_dtp_pt_merged_rom
+   623 000004C5 C9                          leave
+   624                                      ;;
+   625 000004C6 55                          push    ebp
+   626 000004C7 89E5                        mov     ebp, esp                              
+   627 000004C9 6A07                        push US_W_P
+   628 000004CB 68[00000000]                push dword(__TABLE_KEYBOARD_PHY)
+   629 000004D0 68[00000000]                push dword(__TABLE_KEYBOARD_VMA)
+   630 000004D5 68[00000000]                push dword(__CR3_TASK2)                    
+   631 000004DA E8(00000000)                call set_dtp_pt_merged_rom
+   632 000004DF C9                          leave
+   633                                      ;;   
+   634 000004E0 55                          push    ebp
+   635 000004E1 89E5                        mov     ebp, esp 
+   636 000004E3 6A07                        push US_W_P
+   637 000004E5 68[00000000]                push dword(__TASK_2_BSS_PHY)
+   638 000004EA 68[00000000]                push dword(__TASK_2_BSS_VMA)
+   639 000004EF 68[00000000]                push dword(__CR3_TASK2)            
+   640 000004F4 E8(00000000)                call set_dtp_pt_merged_rom
+   641 000004F9 C9                          leave
+   642                                      ;;
+   643 000004FA 55                          push    ebp
+   644 000004FB 89E5                        mov     ebp, esp 
+   645 000004FD 6A07                        push US_W_P
+   646 000004FF 68[00000000]                push dword(__TASK_2_DATA_PHY)
+   647 00000504 68[00000000]                push dword(__TASK_2_DATA_VMA)
+   648 00000509 68[00000000]                push dword(__CR3_TASK2)           
+   649 0000050E E8(00000000)                call set_dtp_pt_merged_rom
+   650 00000513 C9                          leave 
+   651                                      ;;
+   652 00000514 55                          push    ebp
+   653 00000515 89E5                        mov     ebp, esp 
+   654 00000517 6A07                        push US_W_P  
+   655 00000519 68[00000000]                push dword(__STACK_TASK2_PHY)
+   656 0000051E 68[00000000]                push dword(__STACK_TASK2_VMA)
+   657 00000523 68[00000000]                push dword(__CR3_TASK2)            
+   658 00000528 E8(00000000)                call set_dtp_pt_merged_rom
+   659 0000052D C9                          leave    
+   660                                  
+   661                                  ;------------------TASK 3-----------------
+   662                                  
+   663 0000052E 55                          push    ebp
+   664 0000052F 89E5                        mov     ebp, esp 
+   665 00000531 6A01                        push SUP_R_P                                      
+   666 00000533 68[00000000]                push dword(__SYS_TABLES_PHY)                
+   667 00000538 68[00000000]                push dword(__SYS_TABLES_VMA )                 
+   668 0000053D 68[00000000]                push dword(__CR3_TASK3)                   
+   669 00000542 E8(00000000)                call set_dtp_pt_merged_rom
+   670 00000547 C9                          leave
+   671                                      ;;
+   672 00000548 55                          push    ebp
+   673 00000549 89E5                        mov     ebp, esp                                           
+   674 0000054B 6A01                        push SUP_R_P;US_W_P;
+   675 0000054D 68[00000000]                push dword(__VIDEO_PHY)
+   676 00000552 68[00000000]                push dword(__VIDEO_VMA)
+   677 00000557 68[00000000]                push dword(__CR3_TASK3)               
+   678 0000055C E8(00000000)                call set_dtp_pt_merged_rom
+   679 00000561 C9                          leave
+   680                                      ;;
+   681 00000562 55                          push    ebp
+   682 00000563 89E5                        mov     ebp, esp                                            
+   683 00000565 6A01                        push SUP_R_P
+   684 00000567 68[00000000]                push dword(__ISR_AND_KEYBOARD_PHY)
+   685 0000056C 68[00000000]                push dword(__ISR_AND_KEYBOARD_VMA)
+   686 00000571 68[00000000]                push dword(__CR3_TASK3)         
+   687 00000576 E8(00000000)                call set_dtp_pt_merged_rom                       
+   688 0000057B C9                          leave
+   689                                      ;;
+   690 0000057C 55                          push    ebp
+   691 0000057D 89E5                        mov     ebp, esp                                       
+   692 0000057F 6A01                        push SUP_R_P;US_R_P;
+   693 00000581 68[00000000]                push dword(__FUNCTIONS_PHY)
+   694 00000586 68[00000000]                push dword(__FUNCTIONS_VMA)
+   695 0000058B 68[00000000]                push dword(__CR3_TASK3)         
+   696 00000590 E8(00000000)                call set_dtp_pt_merged_rom                   
+   697 00000595 C9                          leave
+   698                                      ;;
+   699 00000596 55                          push    ebp
+   700 00000597 89E5                        mov     ebp, esp 
+   701 00000599 6A03                        push SUP_W_P;Ok                                            
+   702 0000059B 68[00000000]                push dword(__SYS_TABLES_TSS_PHY)               
+   703 000005A0 68[00000000]                push dword(__SYS_TABLES_TSS_VMA)              
+   704 000005A5 68[00000000]                push dword(__CR3_TASK3)                       
+   705 000005AA E8(00000000)                call set_dtp_pt_merged_rom
+   706 000005AF C9                          leave
+   707                                      ;;
+   708 000005B0 55                          push    ebp
+   709 000005B1 89E5                        mov     ebp, esp 
+   710 000005B3 6A03                        push SUP_W_P;Ok                                            
+   711 000005B5 68[00000000]                push dword(__TSS_TASK3)               
+   712 000005BA 68[00000000]                push dword(__TSS_TASK3)              
+   713 000005BF 68[00000000]                push dword(__CR3_TASK3)                       
+   714 000005C4 E8(00000000)                call set_dtp_pt_merged_rom
+   715 000005C9 C9                          leave
+   716                                      ;;    
+   717 000005CA 55                          push    ebp
+   718 000005CB 89E5                        mov     ebp, esp 
+   719 000005CD 6A03                        push SUP_W_P
+   720 000005CF 68[00000000]                push dword(__SYS_TABLES_PAG_T3_PHY)
+   721 000005D4 68[00000000]                push dword(__SYS_TABLES_PAG_T3_VMA)
+   722 000005D9 68[00000000]                push dword(__CR3_TASK3)         
+   723 000005DE E8(00000000)                call set_dtp_pt_merged_rom
+   724 000005E3 C9                          leave
+   725                                      ;;
+   726 000005E4 55                          push    ebp
+   727 000005E5 89E5                        mov     ebp, esp                                           
+   728 000005E7 6A03                        push SUP_W_P
+   729 000005E9 68[00000000]                push dword(__DATA_PHY)
+   730 000005EE 68[00000000]                push dword(__DATA_VMA)
+   731 000005F3 68[00000000]                push dword(__CR3_TASK3)                           
+   732 000005F8 E8(00000000)                call set_dtp_pt_merged_rom
+   733 000005FD C9                          leave
+   734                                      ;;
+   735 000005FE 55                          push    ebp
+   736 000005FF 89E5                        mov     ebp, esp
+   737 00000601 6A03                        push SUP_W_P     
+   738 00000603 68[00000000]                push dword(__STACK_KERNEL_T3_PHY)
+   739 00000608 68[00000000]                push dword(__STACK_KERNEL_T3_VMA)
+   740 0000060D 68[00000000]                push dword(__CR3_TASK3)  
+   741 00000612 E8(00000000)                call set_dtp_pt_merged_rom
+   742 00000617 C9                          leave
+   743                                      ;;  
+   744                                      ; push    ebp
+   745                                      ; mov     ebp, esp 
+   746                                      ; push SUP_W_P
+   747                                      ; push dword(__STACK_START_32_PHY)
+   748                                      ; push dword(__STACK_START_32)
+   749                                      ; push dword(__CR3_TASK3)           
+   750                                      ; call set_dtp_pt_merged_rom
+   751                                      ; leave
+   752                                      ;;
+   753 00000618 55                          push    ebp
+   754 00000619 89E5                        mov     ebp, esp 
+   755 0000061B 6A05                        push US_R_P;SUP_R_P;
+   756 0000061D 68[00000000]                push dword(__TASK_3_TEXT_PHY)
+   757 00000622 68[00000000]                push dword(__TASK_3_TEXT_VMA)
+   758 00000627 68[00000000]                push dword(__CR3_TASK3)           
+   759 0000062C E8(00000000)                call set_dtp_pt_merged_rom
+   760 00000631 C9                          leave
+   761                                      ;;
+   762 00000632 55                          push    ebp
+   763 00000633 89E5                        mov     ebp, esp 
+   764 00000635 6A05                        push US_R_P
+   765 00000637 68[00000000]                push dword(__TASK_3_RODATA_PHY)
+   766 0000063C 68[00000000]                push dword(__TASK_3_RODATA_VMA)
+   767 00000641 68[00000000]                push dword(__CR3_TASK3)           
+   768 00000646 E8(00000000)                call set_dtp_pt_merged_rom
+   769 0000064B C9                          leave
+   770                                      ;;
+   771 0000064C 55                          push    ebp
+   772 0000064D 89E5                        mov     ebp, esp                                
+   773 0000064F 6A07                        push US_W_P
+   774 00000651 68[00000000]                push dword(__TABLE_KEYBOARD_PHY)
+   775 00000656 68[00000000]                push dword(__TABLE_KEYBOARD_VMA)
+   776 0000065B 68[00000000]                push dword(__CR3_TASK3)                    
+   777 00000660 E8(00000000)                call set_dtp_pt_merged_rom
+   778 00000665 C9                          leave
+   779                                      ;;
+   780 00000666 55                          push    ebp
+   781 00000667 89E5                        mov     ebp, esp 
+   782 00000669 6A07                        push US_W_P
+   783 0000066B 68[00000000]                push dword( __TASK_3_BSS_PHY)
+   784 00000670 68[00000000]                push dword(__TASK_3_BSS_VMA)
+   785 00000675 68[00000000]                push dword(__CR3_TASK3)           
+   786 0000067A E8(00000000)                call set_dtp_pt_merged_rom
+   787 0000067F C9                          leave
+   788                                      ;;
+   789 00000680 55                          push    ebp
+   790 00000681 89E5                        mov     ebp, esp 
+   791 00000683 6A07                        push US_W_P
+   792 00000685 68[00000000]                push dword(__TASK_3_DATA_PHY)
+   793 0000068A 68[00000000]                push dword(__TASK_3_DATA_VMA)
+   794 0000068F 68[00000000]                push dword(__CR3_TASK3)           
+   795 00000694 E8(00000000)                call set_dtp_pt_merged_rom
+   796 00000699 C9                          leave
+   797                                      ;;
+   798 0000069A 55                          push    ebp
+   799 0000069B 89E5                        mov     ebp, esp 
+   800 0000069D 6A07                        push US_W_P  
+   801 0000069F 68[00000000]                push dword(__STACK_TASK3_PHY)
+   802 000006A4 68[00000000]                push dword(__STACK_TASK3_VMA)
+   803 000006A9 68[00000000]                push dword(__CR3_TASK3)           
+   804 000006AE E8(00000000)                call set_dtp_pt_merged_rom
+   805 000006B3 C9                          leave
+   806                                  
+   807                                  
+   808                                  ;------------------TASK 4-----------------
+   809                                  
+   810 000006B4 55                          push    ebp
+   811 000006B5 89E5                        mov     ebp, esp 
+   812 000006B7 6A01                        push SUP_R_P                                      
+   813 000006B9 68[00000000]                push dword(__SYS_TABLES_PHY)                
+   814 000006BE 68[00000000]                push dword(__SYS_TABLES_VMA )                 
+   815 000006C3 68[00000000]                push dword(__CR3_TASK4)                   
+   816 000006C8 E8(00000000)                call set_dtp_pt_merged_rom
+   817 000006CD C9                          leave
+   818                                      ;;
+   819 000006CE 55                          push    ebp
+   820 000006CF 89E5                        mov     ebp, esp                                            
+   821 000006D1 6A01                        push SUP_R_P
+   822 000006D3 68[00000000]                push dword(__ISR_AND_KEYBOARD_PHY)
+   823 000006D8 68[00000000]                push dword(__ISR_AND_KEYBOARD_VMA)
+   824 000006DD 68[00000000]                push dword(__CR3_TASK4)         
+   825 000006E2 E8(00000000)                call set_dtp_pt_merged_rom                       
+   826 000006E7 C9                          leave
+   827                                      ;;
+   828 000006E8 55                          push    ebp
+   829 000006E9 89E5                        mov     ebp, esp 
+   830 000006EB 6A03                        push SUP_W_P;Ok                                            
+   831 000006ED 68[00000000]                push dword(__TSS_TASK4)               
+   832 000006F2 68[00000000]                push dword(__TSS_TASK4)              
+   833 000006F7 68[00000000]                push dword(__CR3_TASK4)                       
+   834 000006FC E8(00000000)                call set_dtp_pt_merged_rom
+   835 00000701 C9                          leave
+   836                                      ;;
+   837 00000702 55                          push    ebp
+   838 00000703 89E5                        mov     ebp, esp 
+   839 00000705 6A03                        push SUP_W_P;Ok                                            
+   840 00000707 68[00000000]                push dword(__SYS_TABLES_TSS_PHY)               
+   841 0000070C 68[00000000]                push dword(__SYS_TABLES_TSS_VMA)              
+   842 00000711 68[00000000]                push dword(__CR3_TASK4)                       
+   843 00000716 E8(00000000)                call set_dtp_pt_merged_rom
+   844 0000071B C9                          leave
+   845                                      ;;
+   846 0000071C 55                          push    ebp
+   847 0000071D 89E5                        mov     ebp, esp 
+   848 0000071F 6A03                        push SUP_W_P
+   849 00000721 68[00000000]                push dword(__SYS_TABLES_PAG_T4_PHY)
+   850 00000726 68[00000000]                push dword(__SYS_TABLES_PAG_T4_VMA)
+   851 0000072B 68[00000000]                push dword(__CR3_TASK4)         
+   852 00000730 E8(00000000)                call set_dtp_pt_merged_rom
+   853 00000735 C9                          leave
+   854                                      ;;
+   855 00000736 55                          push    ebp
+   856 00000737 89E5                        mov     ebp, esp                                           
+   857 00000739 6A03                        push SUP_W_P
+   858 0000073B 68[00000000]                push dword(__DATA_PHY)
+   859 00000740 68[00000000]                push dword(__DATA_VMA)
+   860 00000745 68[00000000]                push dword(__CR3_TASK4)                           
+   861 0000074A E8(00000000)                call set_dtp_pt_merged_rom
+   862 0000074F C9                          leave
+   863                                      ;;
+   864 00000750 55                          push    ebp
+   865 00000751 89E5                        mov     ebp, esp
+   866 00000753 6A03                        push SUP_W_P     
+   867 00000755 68[00000000]                push dword(__STACK_KERNEL_T4_PHY)
+   868 0000075A 68[00000000]                push dword(__STACK_KERNEL_T4_VMA)
+   869 0000075F 68[00000000]                push dword(__CR3_TASK4)  
+   870 00000764 E8(00000000)                call set_dtp_pt_merged_rom
+   871 00000769 C9                          leave
+   872                                      ;;
+   873                                      ;;
+   874 0000076A 55                          push    ebp
+   875 0000076B 89E5                        mov     ebp, esp 
+   876 0000076D 6A01                        push SUP_R_P ; US_R_P
+   877 0000076F 68[00000000]                push dword(__TASK_4_TEXT_PHY)
+   878 00000774 68[00000000]                push dword(__TASK_4_TEXT_VMA)
+   879 00000779 68[00000000]                push dword(__CR3_TASK4)           
+   880 0000077E E8(00000000)                call set_dtp_pt_merged_rom
+   881 00000783 C9                          leave
+   882                                      ;;
+   883 00000784 55                          push    ebp
+   884 00000785 89E5                        mov     ebp, esp 
+   885 00000787 6A01                        push SUP_R_P
+   886 00000789 68[00000000]                push dword(__TASK_4_RODATA_PHY)
+   887 0000078E 68[00000000]                push dword(__TASK_4_RODATA_VMA)
+   888 00000793 68[00000000]                push dword(__CR3_TASK4)           
+   889 00000798 E8(00000000)                call set_dtp_pt_merged_rom
+   890 0000079D C9                          leave
+   891                                      ;;
+   892 0000079E 55                          push    ebp
+   893 0000079F 89E5                        mov     ebp, esp 
+   894 000007A1 6A03                        push SUP_W_P
+   895 000007A3 68[00000000]                push dword( __TASK_4_BSS_PHY)
+   896 000007A8 68[00000000]                push dword(__TASK_4_BSS_VMA)
+   897 000007AD 68[00000000]                push dword(__CR3_TASK4)           
+   898 000007B2 E8(00000000)                call set_dtp_pt_merged_rom
+   899 000007B7 C9                          leave
+   900                                      ;;
+   901 000007B8 55                          push    ebp
+   902 000007B9 89E5                        mov     ebp, esp 
+   903 000007BB 6A03                        push SUP_W_P
+   904 000007BD 68[00000000]                push dword(__TASK_4_DATA_PHY)
+   905 000007C2 68[00000000]                push dword(__TASK_4_DATA_VMA)
+   906 000007C7 68[00000000]                push dword(__CR3_TASK4)           
+   907 000007CC E8(00000000)                call set_dtp_pt_merged_rom
+   908 000007D1 C9                          leave
+   909                                      ;;
+   910 000007D2 55                          push    ebp
+   911 000007D3 89E5                        mov     ebp, esp 
+   912 000007D5 6A03                        push SUP_W_P ;US_W_P  
+   913 000007D7 68[00000000]                push dword(__STACK_TASK4_PHY)
+   914 000007DC 68[00000000]                push dword(__STACK_TASK4_VMA)
+   915 000007E1 68[00000000]                push dword(__CR3_TASK4)           
+   916 000007E6 E8(00000000)                call set_dtp_pt_merged_rom
+   917 000007EB C9                          leave
+   918                                  
+   919                                  
+   920                                      ;; Ready to turn on paging, say touching CR registers, go on
+   921                                      
+   922 000007EC E9(00000000)                jmp TURN_ON_PAGING ; Return ready to turn on paging

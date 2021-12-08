@@ -1,0 +1,182 @@
+
+./bin/mi_bios.elf:     formato del fichero elf32-i386
+./bin/mi_bios.elf
+arquitectura: i386, opciones 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+dirección de inicio 0xfffffff0
+
+Encabezado del Programa:
+    LOAD off    0x00001000 vaddr 0xffff0000 paddr 0xffff0000 align 2**12
+         filesz 0x0000003f memsz 0x0000003f flags r--
+    LOAD off    0x00002000 vaddr 0x00100000 paddr 0xffff1000 align 2**12
+         filesz 0x0000003c memsz 0x0000003c flags r-x
+    LOAD off    0x00003000 vaddr 0x00202000 paddr 0xffff2000 align 2**12
+         filesz 0x00000003 memsz 0x00000003 flags r--
+    LOAD off    0x00003800 vaddr 0xfffff800 paddr 0xfffff800 align 2**12
+         filesz 0x00000800 memsz 0x00000800 flags rwx
+   STACK off    0x00000000 vaddr 0x00000000 paddr 0x00000000 align 2**4
+         filesz 0x00000000 memsz 0x00000000 flags rwx
+
+Secciones:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .codigo_kernel32 00000003  00202000  ffff2000  00003000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .functions    0000003c  00100000  ffff1000  00002000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .init16       0000003f  ffff0000  ffff0000  00001000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  3 .init32       0000007e  fffff800  fffff800  00003800  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  4 .functions_rom 0000003c  fffffc00  fffffc00  00003c00  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  5 .data         00000026  fffffd00  fffffd00  00003d00  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  6 .reset        00000010  fffffff0  fffffff0  00003ff0  2**4
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  7 .comment      00000029  00000000  00000000  00004000  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+00202000 l    d  .codigo_kernel32	00000000 .codigo_kernel32
+00100000 l    d  .functions	00000000 .functions
+ffff0000 l    d  .init16	00000000 .init16
+fffff800 l    d  .init32	00000000 .init32
+fffffc00 l    d  .functions_rom	00000000 .functions_rom
+fffffd00 l    d  .data	00000000 .data
+fffffff0 l    d  .reset	00000000 .reset
+00000000 l    d  .comment	00000000 .comment
+00000000 l    df *ABS*	00000000 src/main.asm
+00202000 l       .codigo_kernel32	00000000 kernel32_init.guard
+00202003 l       .codigo_kernel32	00000000 kernel32_end
+00000000 l    df *ABS*	00000000 functions.c
+00000000 l    df *ABS*	00000000 src/init16.asm
+ffff003e l       .init16	00000000 fault_end
+00000000 l    df *ABS*	00000000 src/init32.asm
+fffff823 l       .init32	00000000 start32_launcher.stack_init
+fffff87b l       .init32	00000000 start32_launcher.halteo
+00000000 l    df *ABS*	00000000 functions_rom.c
+00000000 l    df *ABS*	00000000 src/sys_tables.asm
+fffffd00 l       .data	00000000 GDT
+00000000 l       *ABS*	00000000 NULL_SEL
+00000020 l       *ABS*	00000000 GDT_LENGTH
+00000000 l    df *ABS*	00000000 src/reset.asm
+fffffff0 g       *ABS*	00000000 __RESET_LMA
+ffff1000 g       *ABS*	00000000 __FUNCTIONS_LMA
+0000003c g       *ABS*	00000000 __functions_size
+fffffc00 g       *ABS*	00000000 __FUNCTIONS_ROM_VMA
+ffff0000 g       *ABS*	00000000 __INIT_16_LMA
+fffffc00 g       *ABS*	00000000 __FUNCTIONS_ROM_LMA
+00000018 g       *ABS*	00000000 DS_SEL
+fffffff0 g       .reset	00000000 reset
+2ff08000 g       *ABS*	00000000 __STACK_START_32
+00100000 g       *ABS*	00000000 __FUNCTIONS_VMA
+ffff0000 g       *ABS*	00000000 __INIT_16_VMA
+fffffd20 g       .data	00000000 _gdtr
+ffff0000 g       .init16	00000000 init16
+fffffd00 g       *ABS*	00000000 __SYS_TABLES_VMA
+00009000 g       *ABS*	00000000 __STACK_START_16
+00202000 g       .codigo_kernel32	00000000 kernel32_init
+fffff800 g       .init32	00000000 init32
+2ff08fff g       *ABS*	00000000 __STACK_END_32
+00202000 g       *ABS*	00000000 __KERNEL_32_VMA
+00100000 g     F .functions	0000003c __fast_memcpy
+00000010 g       *ABS*	00000000 CS_SEL_32
+000003ff g       *ABS*	00000000 __STACK_SIZE_32
+00009fff g       *ABS*	00000000 __STACK_END_16
+ffff2000 g       *ABS*	00000000 __KERNEL_32_LMA
+00000008 g       *ABS*	00000000 CS_SEL_16
+fffffff0 g       *ABS*	00000000 __RESET_VMA
+00000003 g       *ABS*	00000000 kernel32_code_size
+fffff800 g       *ABS*	00000000 __INIT_32_VMA
+00060000 g       *ABS*	00000000 __EH_FRAME
+00050000 g       *ABS*	00000000 __DATA_NO_INIT
+fffff800 g       *ABS*	00000000 __INIT_32_LMA
+fffffd00 g       *ABS*	00000000 __SYS_TABLES_LMA
+00000003 g       *ABS*	00000000 __codigo_kernel32_size
+fffffc00 g     F .functions_rom	0000003c __fast_memcpy_rom
+fffff800 g       .init32	00000000 start32_launcher
+
+
+Contenido de la sección .codigo_kernel32:
+ 202000 f4ebfd                               ...             
+Contenido de la sección .functions:
+ 100000 5589e583 ec10c645 ff00837d 10007426  U......E...}..t&
+ 100010 eb1a836d 10018b55 088d4204 8945088b  ...m...U..B..E..
+ 100020 450c8d48 04894d0c 8b128910 837d1000  E..H..M......}..
+ 100030 75e0c645 ff010fb6 45ffc9c3           u..E....E...    
+Contenido de la sección .init16:
+ ffff0000 66a90000 00007536 6631c00f 22d88cc8  f.....u6f1.."...
+ ffff0010 8ed8b800 908ed0bc ff9f0f20 c0660d00  ........... .f..
+ ffff0020 0000600f 22c00f09 0f011620 fd0f01e0  ..`."...... ....
+ ffff0030 83c8010f 01f066ea 00f8ffff 1000f4    ......f........ 
+Contenido de la sección .init32:
+ fffff800 6687db66 b818008e d88ec08e e88ee08e  f..f............
+ fffff810 d0bcff8f f02f31c0 66b8ffff 8ed0b9ff  ...../1.f.......
+ fffff820 03000050 e2fdbcff 8ff02f66 87db5589  ...P....../f..U.
+ fffff830 e5683c00 00006800 00100068 0010ffff  .h<...h....h....
+ fffff840 e8bb0300 006687db c983f801 752d6687  .....f......u-f.
+ fffff850 db5589e5 68030000 00680020 20006800  .U..h....h.  .h.
+ fffff860 20ffffe8 98030000 6687dbc9 83f80175   .......f......u
+ fffff870 0a6687db ea002020 001000f4 ebfd      .f....  ......  
+Contenido de la sección .functions_rom:
+ fffffc00 5589e583 ec10c645 ff00837d 10007426  U......E...}..t&
+ fffffc10 eb1a836d 10018b55 088d4204 8945088b  ...m...U..B..E..
+ fffffc20 450c8d48 04894d0c 8b128910 837d1000  E..H..M......}..
+ fffffc30 75e0c645 ff010fb6 45ffc9c3           u..E....E...    
+Contenido de la sección .data:
+ fffffd00 00000000 00000000 ffff0000 ff9940ff  ..............@.
+ fffffd10 ffff0000 0099cf00 ffff0000 0092cf00  ................
+ fffffd20 1f0000fd 0f00                        ......          
+Contenido de la sección .reset:
+ fffffff0 fafce90b 00909090 90909090 90909090  ................
+Contenido de la sección .comment:
+ 0000 4743433a 20285562 756e7475 20372e35  GCC: (Ubuntu 7.5
+ 0010 2e302d33 7562756e 7475317e 31382e30  .0-3ubuntu1~18.0
+ 0020 34292037 2e352e30 00                 4) 7.5.0.       
+
+Desensamblado de la sección .functions:
+00100000 <__fast_memcpy> push   %ebp
+00100001 <__fast_memcpy+0x1> mov    %esp,%ebp
+00100003 <__fast_memcpy+0x3> sub    $0x10,%esp
+00100006 <__fast_memcpy+0x6> movb   $0x0,-0x1(%ebp)
+0010000a <__fast_memcpy+0xa> cmpl   $0x0,0x10(%ebp)
+0010000e <__fast_memcpy+0xe> je     00100036 <__fast_memcpy+0x36>
+00100010 <__fast_memcpy+0x10> jmp    0010002c <__fast_memcpy+0x2c>
+00100012 <__fast_memcpy+0x12> subl   $0x1,0x10(%ebp)
+00100016 <__fast_memcpy+0x16> mov    0x8(%ebp),%edx
+00100019 <__fast_memcpy+0x19> lea    0x4(%edx),%eax
+0010001c <__fast_memcpy+0x1c> mov    %eax,0x8(%ebp)
+0010001f <__fast_memcpy+0x1f> mov    0xc(%ebp),%eax
+00100022 <__fast_memcpy+0x22> lea    0x4(%eax),%ecx
+00100025 <__fast_memcpy+0x25> mov    %ecx,0xc(%ebp)
+00100028 <__fast_memcpy+0x28> mov    (%edx),%edx
+0010002a <__fast_memcpy+0x2a> mov    %edx,(%eax)
+0010002c <__fast_memcpy+0x2c> cmpl   $0x0,0x10(%ebp)
+00100030 <__fast_memcpy+0x30> jne    00100012 <__fast_memcpy+0x12>
+00100032 <__fast_memcpy+0x32> movb   $0x1,-0x1(%ebp)
+00100036 <__fast_memcpy+0x36> movzbl -0x1(%ebp),%eax
+0010003a <__fast_memcpy+0x3a> leave  
+0010003b <__fast_memcpy+0x3b> ret    
+
+Desensamblado de la sección .functions_rom:
+fffffc00 <__fast_memcpy_rom> push   %ebp
+fffffc01 <__fast_memcpy_rom+0x1> mov    %esp,%ebp
+fffffc03 <__fast_memcpy_rom+0x3> sub    $0x10,%esp
+fffffc06 <__fast_memcpy_rom+0x6> movb   $0x0,-0x1(%ebp)
+fffffc0a <__fast_memcpy_rom+0xa> cmpl   $0x0,0x10(%ebp)
+fffffc0e <__fast_memcpy_rom+0xe> je     fffffc36 <__fast_memcpy_rom+0x36>
+fffffc10 <__fast_memcpy_rom+0x10> jmp    fffffc2c <__fast_memcpy_rom+0x2c>
+fffffc12 <__fast_memcpy_rom+0x12> subl   $0x1,0x10(%ebp)
+fffffc16 <__fast_memcpy_rom+0x16> mov    0x8(%ebp),%edx
+fffffc19 <__fast_memcpy_rom+0x19> lea    0x4(%edx),%eax
+fffffc1c <__fast_memcpy_rom+0x1c> mov    %eax,0x8(%ebp)
+fffffc1f <__fast_memcpy_rom+0x1f> mov    0xc(%ebp),%eax
+fffffc22 <__fast_memcpy_rom+0x22> lea    0x4(%eax),%ecx
+fffffc25 <__fast_memcpy_rom+0x25> mov    %ecx,0xc(%ebp)
+fffffc28 <__fast_memcpy_rom+0x28> mov    (%edx),%edx
+fffffc2a <__fast_memcpy_rom+0x2a> mov    %edx,(%eax)
+fffffc2c <__fast_memcpy_rom+0x2c> cmpl   $0x0,0x10(%ebp)
+fffffc30 <__fast_memcpy_rom+0x30> jne    fffffc12 <__fast_memcpy_rom+0x12>
+fffffc32 <__fast_memcpy_rom+0x32> movb   $0x1,-0x1(%ebp)
+fffffc36 <__fast_memcpy_rom+0x36> movzbl -0x1(%ebp),%eax
+fffffc3a <__fast_memcpy_rom+0x3a> leave  
+fffffc3b <__fast_memcpy_rom+0x3b> ret    
